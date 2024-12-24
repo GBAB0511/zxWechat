@@ -21,7 +21,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ComponentScan(basePackages = {"com.zbkj"})
 @MapperScan(basePackages = {"com.zbkj.**.dao"})
 public class CrmebAdminApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(CrmebAdminApplication.class, args);
     }

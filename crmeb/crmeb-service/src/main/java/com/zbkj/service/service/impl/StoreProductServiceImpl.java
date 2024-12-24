@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -127,7 +128,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 break;
             case 2:
                 //仓库中（未上架）
-                lambdaQueryWrapper.eq(StoreProduct::getIsShow, false);
+//                lambdaQueryWrapper.eq(StoreProduct::getIsShow, true);
                 lambdaQueryWrapper.eq(StoreProduct::getIsRecycle, false);
                 lambdaQueryWrapper.eq(StoreProduct::getIsDel, false);
                 break;
@@ -197,12 +198,12 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 storeProductResponse.setContent(null == sd.getDescription()?"":sd.getDescription());
             }
             // 处理分类中文
-            List<Category> cg = categoryService.getByIds(CrmebUtil.stringToArray(product.getCateId()));
-            if (CollUtil.isEmpty(cg)) {
-                storeProductResponse.setCateValues("");
-            } else {
-                storeProductResponse.setCateValues(cg.stream().map(Category::getName).collect(Collectors.joining(",")));
-            }
+//            List<Category> cg = categoryService.getByIds(CrmebUtil.stringToArray(product.getCateId()));
+//            if (CollUtil.isEmpty(cg)) {
+//                storeProductResponse.setCateValues("");
+//            } else {
+//                storeProductResponse.setCateValues(cg.stream().map(Category::getName).collect(Collectors.joining(",")));
+//            }
 
             storeProductResponse.setCollectCount(
                     storeProductRelationService.getList(product.getId(),"collect").size());
@@ -243,7 +244,11 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         BeanUtils.copyProperties(request, storeProduct);
         storeProduct.setId(null);
         storeProduct.setAddTime(DateUtil.getNowTime());
-        storeProduct.setIsShow(false);
+        storeProduct.setIsShow(true);
+        storeProduct.setStartTime(DateUtil.getSecondTimestamp(request.getStartTime()));
+        storeProduct.setEndTime(DateUtil.getSecondTimestamp(request.getEndTime()));
+        storeProduct.setAddress(request.getAddress());
+        storeProduct.setTips(request.getTips());
 
         // 设置Acticity活动
         storeProduct.setActivity(getProductActivityStr(request.getActivity()));
@@ -267,30 +272,30 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         storeProduct.setStock(attrValueAddRequestList.stream().mapToInt(StoreProductAttrValueAddRequest::getStock).sum());
 
         // 默认值设置
-        if (ObjectUtil.isNull(request.getSort())) {
-            storeProduct.setSort(0);
-        }
-        if (ObjectUtil.isNull(request.getIsHot())) {
-            storeProduct.setIsHot(false);
-        }
-        if (ObjectUtil.isNull(request.getIsBenefit())) {
-            storeProduct.setIsBenefit(false);
-        }
-        if (ObjectUtil.isNull(request.getIsBest())) {
-            storeProduct.setIsBest(false);
-        }
-        if (ObjectUtil.isNull(request.getIsNew())) {
-            storeProduct.setIsNew(false);
-        }
-        if (ObjectUtil.isNull(request.getIsGood())) {
-            storeProduct.setIsGood(false);
-        }
-        if (ObjectUtil.isNull(request.getGiveIntegral())) {
-            storeProduct.setGiveIntegral(0);
-        }
-        if (ObjectUtil.isNull(request.getFicti())) {
-            storeProduct.setFicti(0);
-        }
+//        if (ObjectUtil.isNull(request.getSort())) {
+//            storeProduct.setSort(0);
+//        }
+//        if (ObjectUtil.isNull(request.getIsHot())) {
+//            storeProduct.setIsHot(false);
+//        }
+//        if (ObjectUtil.isNull(request.getIsBenefit())) {
+//            storeProduct.setIsBenefit(false);
+//        }
+//        if (ObjectUtil.isNull(request.getIsBest())) {
+//            storeProduct.setIsBest(false);
+//        }
+//        if (ObjectUtil.isNull(request.getIsNew())) {
+//            storeProduct.setIsNew(false);
+//        }
+//        if (ObjectUtil.isNull(request.getIsGood())) {
+//            storeProduct.setIsGood(false);
+//        }
+//        if (ObjectUtil.isNull(request.getGiveIntegral())) {
+//            storeProduct.setGiveIntegral(0);
+//        }
+//        if (ObjectUtil.isNull(request.getFicti())) {
+//            storeProduct.setFicti(0);
+//        }
 
         List<StoreProductAttrAddRequest> addRequestList = request.getAttr();
         List<StoreProductAttr> attrList = addRequestList.stream().map(e -> {
@@ -1111,8 +1116,29 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     public List<StoreProduct> getIndexProduct(Integer type, PageParamRequest pageParamRequest) {
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<StoreProduct> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName,
-                StoreProduct::getPrice, StoreProduct::getOtPrice, StoreProduct::getActivity);
+//        lambdaQueryWrapper.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName,
+//                StoreProduct::getPrice, StoreProduct::getOtPrice, StoreProduct::getActivity);
+        // 选择需要查询的字段，包括新增的字段
+        lambdaQueryWrapper.select(
+                StoreProduct::getId,                            // 商品ID
+                StoreProduct::getImage,                         // 商品图片
+                StoreProduct::getStoreName,                     // 商店名称
+                StoreProduct::getPrice,                         // 商品价格
+                StoreProduct::getOtPrice,                       // 商品原价
+                StoreProduct::getActivity,                      // 活动
+                StoreProduct::getStartTime,                     // 开始时间
+                StoreProduct::getEndTime,                       // 结束时间
+                StoreProduct::getAddress,                       // 活动地址
+                StoreProduct::getTips,                          // 适龄区间
+                StoreProduct::getDepartureAssemblyPoint,       // 启程集合点
+                StoreProduct::getReturnGatheringPoint,         // 返程集合点
+                StoreProduct::getEarlyBirdStartTime,           // 早鸟开始时间
+                StoreProduct::getEarlyBirdEndTime,             // 早鸟结束时间
+                StoreProduct::getDiscountAmount,              // 优惠金额
+                StoreProduct::getIsSeckill    ,             // 秒杀状态
+                StoreProduct::getVipPrice                  // 会员价格
+        );
+
         switch (type) {
             case Constants.INDEX_RECOMMEND_BANNER: //精品推荐
                 lambdaQueryWrapper.eq(StoreProduct::getIsBest, true);
@@ -1136,9 +1162,27 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         lambdaQueryWrapper.gt(StoreProduct::getStock, 0);
         lambdaQueryWrapper.eq(StoreProduct::getIsShow, true);
 
+
+
         lambdaQueryWrapper.orderByDesc(StoreProduct::getSort);
         lambdaQueryWrapper.orderByDesc(StoreProduct::getId);
-        return dao.selectList(lambdaQueryWrapper);
+        // 执行查询并获取结果
+        List<StoreProduct> products = dao.selectList(lambdaQueryWrapper);
+//       List<StoreProduct> storeProducts = new ArrayList<>();
+        // 计算每个商品的 viperPrice
+        for (StoreProduct product : products) {
+            if (product.getIsSeckill()!=null && product.getIsSeckill()) {
+                // 秒杀商品：viperPrice = 原价 - 优惠金额
+                BigDecimal viperPrice = product.getPrice().subtract(product.getDiscountAmount());
+                product.setVipPrice(viperPrice); // 设置计算后的 viperPrice
+            } else {
+                // 非秒杀商品：viperPrice = 原价
+                product.setVipPrice(product.getOtPrice()); // 设置 viperPrice 等于原价
+            }
+
+        }
+
+        return products;
     }
 
     /**

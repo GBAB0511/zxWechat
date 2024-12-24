@@ -143,6 +143,14 @@ public class IndexServiceImpl implements IndexService {
         List<IndexProductResponse> productResponseArrayList = new ArrayList<>();
         for (StoreProduct storeProduct : storeProductList) {
             IndexProductResponse productResponse = new IndexProductResponse();
+
+            //如果早早鸟状态为true 则设置商品早早鸟价格
+            if (storeProduct.getIsSeckill()!=null && storeProduct.getIsSeckill()==true ){
+                storeProduct.setVipPrice(storeProduct.getPrice().subtract(storeProduct.getDiscountAmount()));
+            }else{
+                storeProduct.setVipPrice(storeProduct.getPrice());
+            }
+
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
             if (activityList.get(0).equals(Constants.PRODUCT_TYPE_NORMAL)) {

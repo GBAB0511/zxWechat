@@ -64,7 +64,7 @@ public class StoreProductController {
     @PreAuthorize("hasAuthority('admin:product:save')")
     @ApiOperation(value = "新增商品")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public CommonResult<String> save(@RequestBody @Validated StoreProductAddRequest request) {
+    public CommonResult<String> save(@RequestBody  StoreProductAddRequest request) {
         if (storeProductService.save(request)) {
             return CommonResult.success();
         } else {
@@ -114,7 +114,7 @@ public class StoreProductController {
     @PreAuthorize("hasAuthority('admin:product:update')")
     @ApiOperation(value = "商品修改")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public CommonResult<String> update(@RequestBody @Validated StoreProductAddRequest storeProductRequest) {
+    public CommonResult<String> update(@RequestBody  StoreProductAddRequest storeProductRequest) {
         if (storeProductService.update(storeProductRequest)) {
             return CommonResult.success();
         } else {

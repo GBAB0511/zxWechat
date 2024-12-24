@@ -196,7 +196,7 @@ public class ProductServiceImpl implements ProductService {
         // 获取商品规格
         List<StoreProductAttr> attrList = attrService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
         // 根据制式设置attr属性
-        productDetailResponse.setProductAttr(attrList);
+//        productDetailResponse.setProductAttr(attrList);
 
         // 根据制式设置sku属性
         HashMap<String, Object> skuMap = CollUtil.newHashMap();
@@ -216,22 +216,22 @@ public class ProductServiceImpl implements ProductService {
         if (ObjectUtil.isNotNull(user)) {
             // 查询用户是否收藏收藏
             user = userService.getInfo();
-            productDetailResponse.setUserCollect(storeProductRelationService.getLikeOrCollectByUser(user.getUid(), id,false).size() > 0);
+//            productDetailResponse.setUserCollect(storeProductRelationService.getLikeOrCollectByUser(user.getUid(), id,false).size() > 0);
             // 判断是否开启分销
             String brokerageFuncStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_BROKERAGE_FUNC_STATUS);
             if (brokerageFuncStatus.equals(Constants.COMMON_SWITCH_OPEN)) {// 分销开启
                 // 判断是否开启气泡
                 String isBubble = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_BROKERAGE_IS_BUBBLE);
                 if (isBubble.equals(Constants.COMMON_SWITCH_OPEN)) {
-                    productDetailResponse.setPriceName(getPacketPriceRange(storeProduct.getIsSub(), storeProductAttrValues, user.getIsPromoter()));
+//                    productDetailResponse.setPriceName(getPacketPriceRange(storeProduct.getIsSub(), storeProductAttrValues, user.getIsPromoter()));
                 }
             }
         } else {
-            productDetailResponse.setUserCollect(false);
+//            productDetailResponse.setUserCollect(false);
         }
         // 商品活动
         List<ProductActivityItemResponse> activityAllH5 = productUtils.getProductAllActivity(storeProduct);
-        productDetailResponse.setActivityAllH5(activityAllH5);
+//        productDetailResponse.setActivityAllH5(activityAllH5);
 
         // 商品浏览量+1
         StoreProduct updateProduct = new StoreProduct();
@@ -272,7 +272,7 @@ public class ProductServiceImpl implements ProductService {
         // 获取商品规格
         List<StoreProductAttr> attrList = attrService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
         // 根据制式设置attr属性
-        productDetailResponse.setProductAttr(attrList);
+//        productDetailResponse.setProductAttr(attrList);
 
         // 根据制式设置sku属性
         HashMap<String, Object> skuMap = CollUtil.newHashMap();

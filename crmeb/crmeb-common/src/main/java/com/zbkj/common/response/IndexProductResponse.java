@@ -39,6 +39,9 @@ public class IndexProductResponse {
     @ApiModelProperty(value = "商品价格")
     private BigDecimal price;
 
+    @ApiModelProperty(value = "会员价格")
+    private BigDecimal vipPrice;
+
     @ApiModelProperty(value = "市场价")
     private BigDecimal otPrice;
 
@@ -65,4 +68,34 @@ public class IndexProductResponse {
 
     @ApiModelProperty(value = "展示图")
     private String flatPattern;
+
+    @ApiModelProperty(value = "开始时间")
+    private Integer startTime;
+
+    @ApiModelProperty(value = "结束时间")
+    private Integer endTime;
+
+    @ApiModelProperty(value = "活动地址")
+    private String address;
+
+    @ApiModelProperty(value = "适龄区间")
+    private String tips;
+
+
+    @ApiModelProperty(value = "启程集合点")
+    private String departureAssemblyPoint;
+
+    @ApiModelProperty(value = "返程集合点")
+    private String returnGatheringPoint;
+
+
+    @ApiModelProperty(value = "早早鸟开始时间")
+    private int earlyBirdStartTime;
+
+    @ApiModelProperty(value = "早早鸟结束时间")
+    private int earlyBirdEndTime;
+
+    @ApiModelProperty(value = "优惠金额")
+    private BigDecimal discountAmount;
+
 }

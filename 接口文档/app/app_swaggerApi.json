@@ -12772,7 +12772,7 @@
         }
       }
     },
-    "/api/front/index": {
+      "/api/front/index": {
       "get": {
         "tags": [
           "首页"

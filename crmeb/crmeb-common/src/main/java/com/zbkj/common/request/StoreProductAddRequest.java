@@ -12,6 +12,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -120,4 +122,40 @@ public class StoreProductAddRequest implements Serializable {
     @ApiModelProperty(value = "展示图")
     @Length(max = 1000, message = "展示图名称长度不能超过1000个字符")
     private String flatPattern;
+
+    @ApiModelProperty(value = "开始时间")
+    private Date startTime;
+
+    @ApiModelProperty(value = "结束时间")
+    private Date endTime;
+
+    @ApiModelProperty(value = "活动地址")
+    private String address;
+
+    @ApiModelProperty(value = "适龄区间")
+    private String tips;
+
+    @ApiModelProperty(value = "剩余时间")
+    private Integer duration;
+
+    @ApiModelProperty(value = "启程集合点")
+    private String departureAssemblyPoint;
+
+    @ApiModelProperty(value = "返程集合点")
+    private String returnGatheringPoint;
+
+
+    @ApiModelProperty(value = "早早鸟开始时间")
+    private Date earlyBirdStartTime;
+
+    @ApiModelProperty(value = "早早鸟结束时间")
+    private Date earlyBirdEndTime;
+
+    @ApiModelProperty(value = "优惠金额")
+    private BigDecimal discountAmount;
+
+
+
+
+
 }
