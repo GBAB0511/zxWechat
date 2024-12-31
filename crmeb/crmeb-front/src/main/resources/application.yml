@@ -33,15 +33,15 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/mall?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+    url: jdbc:mysql://47.113.195.163:13306/mall?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
     username: root
-    password: 980511zhao
+    password: Dxang.com123
+
   redis:
-    host: 127.0.0.1 #地址
+    host: localhost #地址
     port: 6379 #端口
-#    password: 111111
-    timeout: 30000 # 连接超时时间（毫秒）
-    database: 3  #默认数据库
+    timeout: 10000 # 连接超时时间（毫秒）
+    database: 1 #默认数据库
     jedis:
       pool:
         max-active: 200 # 连接池最大连接数（使用负值表示没有限制）
@@ -68,7 +68,7 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
-#      logic-delete-field: isDel  #全局逻辑删除字段值 3.3.0开始支持，详情看下面。
+      #      logic-delete-field: isDel  #全局逻辑删除字段值 3.3.0开始支持，详情看下面。
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
 
