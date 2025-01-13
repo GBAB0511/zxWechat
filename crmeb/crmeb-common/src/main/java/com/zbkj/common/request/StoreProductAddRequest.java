@@ -1,6 +1,7 @@
 package com.zbkj.common.request;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,6 +13,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -103,11 +106,11 @@ public class StoreProductAddRequest implements Serializable {
     @ApiModelProperty(value = "活动显示排序 0=默认，1=秒杀，2=砍价，3=拼团")
     private List<String> activity;
 
-    @ApiModelProperty(value = "商品属性", required = true)
+    @ApiModelProperty(value = "商品属性")
     @NotEmpty(message = "商品属性不能为空")
     private List<StoreProductAttrAddRequest> attr;
 
-    @ApiModelProperty(value = "商品属性详情", required = true)
+    @ApiModelProperty(value = "商品属性详情")
     @NotEmpty(message = "商品属性详情不能为空")
     private List<StoreProductAttrValueAddRequest> attrValue;
 
@@ -120,4 +123,62 @@ public class StoreProductAddRequest implements Serializable {
     @ApiModelProperty(value = "展示图")
     @Length(max = 1000, message = "展示图名称长度不能超过1000个字符")
     private String flatPattern;
+
+    @ApiModelProperty(value = "开始时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC")
+    private Date startTime;
+
+    @ApiModelProperty(value = "结束时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC")
+    private Date endTime;
+
+    @ApiModelProperty(value = "活动地址")
+    @NotBlank(message = "活动地址不能为空")
+    private String address;
+
+    @ApiModelProperty(value = "适龄区间")
+    @NotBlank(message = "适龄区间不能为空")
+    private String tips;
+
+    @ApiModelProperty(value = "剩余时间")
+    private Integer duration;
+
+    @ApiModelProperty(value = "启程集合点")
+    @NotBlank(message = "启程集合点不能为空")
+    private String departureAssemblyPoint;
+
+    @ApiModelProperty(value = "返程集合点")
+    @NotBlank(message = "返程集合点不能为空")
+    private String returnGatheringPoint;
+
+
+    @ApiModelProperty(value = "早早鸟开始时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC")
+    private Date earlyBirdStartTime;
+
+    @ApiModelProperty(value = "早早鸟结束时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC")
+    private Date earlyBirdEndTime;
+
+    @ApiModelProperty(value = "优惠金额")
+    private BigDecimal discountAmount;
+
+    @ApiModelProperty(value = "库存")
+    private Integer stock;
+
+    @ApiModelProperty(value = "课程内容")
+    @NotBlank(message = "课程内容不能为空")
+    private String courseContent;
+
+    @ApiModelProperty(value = "食宿交通")
+    @NotBlank(message = "食宿交通不能为空")
+    private String transportation;
+
+    @ApiModelProperty(value = "费用说明")
+    @NotBlank(message = "费用说明不能为空")
+    private String costDescription;
+
+    @ApiModelProperty(value = "安全保障")
+    @NotBlank(message = "安全保障不能为空")
+    private String securityGuarantee;
 }

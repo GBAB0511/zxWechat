@@ -157,4 +157,50 @@ public class StoreProduct implements Serializable {
     @ApiModelProperty(value = "商品详情")
     @TableField(exist = false)
     private String content;
+
+    @ApiModelProperty(value = "开始时间")
+    private Integer startTime;
+
+    @ApiModelProperty(value = "结束时间")
+    private Integer endTime;
+
+    @ApiModelProperty(value = "活动地址")
+    private String address;
+
+    @ApiModelProperty(value = "适龄区间")
+    private String tips;
+
+
+    @ApiModelProperty(value = "启程集合点")
+    private String departureAssemblyPoint;
+
+    @ApiModelProperty(value = "返程集合点")
+    private String returnGatheringPoint;
+
+
+    @ApiModelProperty(value = "早早鸟开始时间")
+
+    private Integer earlyBirdStartTime;
+
+    @ApiModelProperty(value = "早早鸟结束时间")
+    @TableField("early_bird_end_time")
+    private Integer earlyBirdEndTime;
+
+    @ApiModelProperty(value = "优惠金额")
+    private BigDecimal discountAmount;
+
+
+
+    @ApiModelProperty(value = "课程内容")
+    private String courseContent;
+
+    @ApiModelProperty(value = "食宿交通")
+    private String transportation;
+
+    @ApiModelProperty(value = "费用说明")
+    private String costDescription;
+
+    @ApiModelProperty(value = "安全保障")
+    private String securityGuarantee;
+
 }

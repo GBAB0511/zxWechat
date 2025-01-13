@@ -143,6 +143,33 @@ public class IndexServiceImpl implements IndexService {
         List<IndexProductResponse> productResponseArrayList = new ArrayList<>();
         for (StoreProduct storeProduct : storeProductList) {
             IndexProductResponse productResponse = new IndexProductResponse();
+//            Long timeDiffMillis = storeProduct.getEndTime() - com.zbkj.common.utils.DateUtil.getTime();
+
+//            // 将毫秒转换为天
+//            Long timeDiffDays = timeDiffMillis / (1000 * 60 * 60 * 24);
+//            productResponse.setRemainingTime(Integer.parseInt(timeDiffDays.toString()));
+            // 获取当前时间的毫秒级时间戳
+            Long currentTimeMillis = System.currentTimeMillis() / 1000;  // 转为秒
+
+            // 计算时间差（秒）
+            Long timeDiffSeconds = storeProduct.getEndTime() - currentTimeMillis;
+
+            // 将秒数转换为毫秒
+            Long timeDiffMillis = timeDiffSeconds * 1000;
+
+            // 将毫秒转换为天数
+            Long timeDiffDays = timeDiffMillis / (1000 * 60 * 60 * 24);
+
+            productResponse.setRemainingTime(Integer.parseInt(timeDiffDays.toString()));
+            System.out.println("剩余天数: " + timeDiffDays);
+
+            //如果早早鸟状态为true 则设置商品早早鸟价格
+            if (storeProduct.getIsSeckill()!=null && storeProduct.getIsSeckill()==true ){
+                storeProduct.setVipPrice(storeProduct.getPrice().subtract(storeProduct.getDiscountAmount()));
+            }else{
+                storeProduct.setVipPrice(storeProduct.getPrice());
+            }
+
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
             if (activityList.get(0).equals(Constants.PRODUCT_TYPE_NORMAL)) {
@@ -182,6 +209,7 @@ public class IndexServiceImpl implements IndexService {
                 }
             }
             BeanUtils.copyProperties(storeProduct, productResponse);
+
             productResponseArrayList.add(productResponse);
         }
         CommonPage<IndexProductResponse> productResponseCommonPage = CommonPage.restPage(productResponseArrayList);

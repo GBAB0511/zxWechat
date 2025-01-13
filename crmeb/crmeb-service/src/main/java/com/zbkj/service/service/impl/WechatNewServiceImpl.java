@@ -249,10 +249,12 @@ public class WechatNewServiceImpl implements WechatNewService {
     @Override
     public String createQrCode(String page, String scene) {
         String miniAccessToken = getMiniAccessToken();
+        page="pages/index/index";
         String url = StrUtil.format(WeChatConstants.WECHAT_MINI_QRCODE_UNLIMITED_URL, miniAccessToken);
         HashMap<String, Object> map = new HashMap<>();
         map.put("scene", scene);
         map.put("page", page);
+        System.out.println(page+"pages/goods_details/index");
         map.put("width", 200);
         byte[] bytes = restTemplateUtil.postJsonDataAndReturnBuffer(url, new JSONObject(map));
         String response = new String(bytes);

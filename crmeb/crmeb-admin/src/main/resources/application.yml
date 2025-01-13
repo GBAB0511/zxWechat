@@ -7,7 +7,10 @@ crmeb:
   wechat-js-api-beta: true #微信js api是否是beta版本
   asyncConfig: false #是否同步config表数据到redis
   asyncWeChatProgramTempList: false #是否同步小程序公共模板库
-  imagePath: /Users/zhaolei/_Projects.localized/IdeaProjects/zxbackend/crmeb/crmebimage/ # 服务器图片路径配置 斜杠结尾
+#  imagePath: /Users/zhaolei/_Projects.localized/IdeaProjects/zxbackend/crmeb/crmebimage/ # 服务器图片路径配置 斜杠结尾
+
+  imagePath: D:\2025-1-5\zxWechat\crmeb\ # 服务器图片路径配置 斜杠结尾
+
   database: mysql
 
 # 配置端口
@@ -38,9 +41,12 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://47.113.195.163:13306/mall?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+#    url: jdbc:mysql://47.113.195.163:13306/mall?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+    url: jdbc:mysql://127.0.0.1:3306/cremb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
     username: root
-    password: Dxang.com123
+    password: 123456
+
+#    password: Dxang.com123
 
   redis:
     host: localhost #地址

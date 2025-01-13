@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品详情
@@ -38,8 +39,8 @@ public class ProductDetailResponse implements Serializable {
     @ApiModelProperty(value = "商品属性详情")
     private HashMap<String, Object> productValue;
 
-    @ApiModelProperty(value = "返佣金额区间")
-    private String priceName;
+//    @ApiModelProperty(value = "返佣金额区间")
+//    private String priceName;
 
     @ApiModelProperty(value = "为移动端特定参数 所有参与的活动")
     private List<ProductActivityItemResponse> activityAllH5;
@@ -47,6 +48,13 @@ public class ProductDetailResponse implements Serializable {
     @ApiModelProperty(value = "商品信息")
     private StoreProduct productInfo;
 
-    @ApiModelProperty(value = "收藏标识")
-    private Boolean userCollect;
+    @ApiModelProperty(value = "早早鸟结束时间")
+    private Integer earlyBirdOverTime;
+
+
+    @ApiModelProperty(value = "营期")
+    private List<Map<String, Object>> operationPeriod;
+
+//    @ApiModelProperty(value = "收藏标识")
+//    private Boolean userCollect;
 }

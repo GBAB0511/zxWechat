@@ -36,7 +36,7 @@ public class CreateOrderRequest implements Serializable {
     private String preOrderNo;
 
     @ApiModelProperty(value = "快递类型: 1-快递配送，2-到店自提")
-    @NotNull(message = "快递类型不能为空")
+//    @NotNull(message = "快递类型不能为空")
     @Range(min = 1, max = 2, message = "未知的快递类型")
     private Integer shippingType;
 

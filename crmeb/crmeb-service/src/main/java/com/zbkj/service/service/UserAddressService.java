@@ -1,6 +1,7 @@
 package com.zbkj.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zbkj.common.model.camper.Camper;
 import com.zbkj.common.request.PageParamRequest;
 import com.zbkj.common.model.user.UserAddress;
 import com.zbkj.common.request.UserAddressRequest;

@@ -7,8 +7,10 @@ import com.zbkj.common.request.PageParamRequest;
 import com.zbkj.common.request.ProductListRequest;
 import com.zbkj.common.request.ProductRequest;
 import com.zbkj.common.response.*;
+import com.zbkj.common.utils.DateUtil;
 import com.zbkj.common.vo.CategoryTreeVo;
 import com.zbkj.front.service.ProductService;
+import com.zbkj.service.service.StoreProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -17,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户 -- 用户中心
@@ -39,6 +43,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Resource
+    private StoreProductService storeProductService;
 
     /**
      * 热门商品推荐
@@ -140,6 +147,22 @@ public class ProductController {
     @RequestMapping(value = "/product/leaderboard", method = RequestMethod.GET)
     public CommonResult<List<StoreProduct>> getLeaderboard() {
         return CommonResult.success(productService.getLeaderboard());
+    }
+
+
+    /**
+     * 根据日期查询范围时间内所有符合条件的课程信息
+     */
+    @ApiOperation(value = "根据日期查询范围时间内所有符合条件的课程信息")
+    @RequestMapping(value = "/product/date", method = RequestMethod.GET)
+    public CommonResult<List<Map>> getProductByDate(@RequestParam(value = "date") String date) {
+        return CommonResult.success(storeProductService.findProductByMonth(DateUtil.strToDate(date, "yyyy-MM")));
+    }
+
+    @ApiOperation(value = "根据时间获取存在课程的课程信息")
+    @RequestMapping(value = "/product/date/list", method = RequestMethod.GET)
+    public CommonResult<List<StoreProduct>> getProductByDateList(@RequestParam(value = "date") Integer date) {
+        return CommonResult.success(storeProductService.getProductByTime(date));
     }
 }
 

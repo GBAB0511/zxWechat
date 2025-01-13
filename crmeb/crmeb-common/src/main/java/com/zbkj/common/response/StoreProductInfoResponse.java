@@ -1,5 +1,6 @@
 package com.zbkj.common.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zbkj.common.model.product.StoreProductAttr;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,7 +8,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,6 +24,7 @@ import java.util.List;
 public class StoreProductInfoResponse implements Serializable {
 
     private static final long serialVersionUID = 9215241889318610262L;
+
 
     @ApiModelProperty(value = "商品id")
     private Integer id;
@@ -118,12 +123,12 @@ public class StoreProductInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "当天参与秒杀次数|秒杀专用")
     private Integer num;
-
-    @ApiModelProperty(value = "砍价开启时间|砍价专用")
-    private Long startTime;
-
-    @ApiModelProperty(value = "砍价结束时间|砍价专用")
-    private Long stopTime;
+//
+//    @ApiModelProperty(value = "砍价开启时间|砍价专用")
+//    private Long startTime;
+//
+//    @ApiModelProperty(value = "砍价结束时间|砍价专用")
+//    private Long stopTime;
 
     @ApiModelProperty(value = "砍价活动名称|砍价专用")
     private String title;
@@ -154,4 +159,56 @@ public class StoreProductInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "展示图")
     private String flatPattern;
+
+
+    @ApiModelProperty(value = "开始时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+
+    @ApiModelProperty(value = "结束时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
+
+    @ApiModelProperty(value = "活动地址")
+    private String address;
+
+    @ApiModelProperty(value = "适龄区间")
+    private String tips;
+
+    @ApiModelProperty(value = "剩余时间")
+    private Integer duration;
+
+    @ApiModelProperty(value = "启程集合点")
+    private String departureAssemblyPoint;
+
+    @ApiModelProperty(value = "返程集合点")
+    private String returnGatheringPoint;
+
+
+    @ApiModelProperty(value = "早早鸟开始时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date earlyBirdStartTime;
+
+    @ApiModelProperty(value = "早早鸟结束时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date earlyBirdEndTime;
+
+    @ApiModelProperty(value = "优惠金额")
+    private BigDecimal discountAmount;
+
+    @ApiModelProperty(value = "课程内容")
+    @NotBlank(message = "课程内容不能为空")
+    private String courseContent;
+
+    @ApiModelProperty(value = "食宿交通")
+    @NotBlank(message = "食宿交通不能为空")
+    private String transportation;
+
+    @ApiModelProperty(value = "费用说明")
+    @NotBlank(message = "费用说明不能为空")
+    private String costDescription;
+
+    @ApiModelProperty(value = "安全保障")
+    @NotBlank(message = "安全保障不能为空")
+    private String securityGuarantee;
 }

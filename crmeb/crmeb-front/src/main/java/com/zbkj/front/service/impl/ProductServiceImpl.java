@@ -33,9 +33,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
 * IndexServiceImpl 接口实现
@@ -178,20 +177,14 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductDetailResponse getDetail(Integer id, String type) {
-        // 获取用户
-        User user = userService.getInfo();
-        SystemUserLevel userLevel = null;
-        if (ObjectUtil.isNotNull(user) && user.getLevel() > 0) {
-            userLevel = systemUserLevelService.getByLevelId(user.getLevel());
-        }
 
-        ProductDetailResponse productDetailResponse = new ProductDetailResponse();
         // 查询商品
         StoreProduct storeProduct = storeProductService.getH5Detail(id);
-        if (ObjectUtil.isNotNull(userLevel)) {
-            storeProduct.setVipPrice(storeProduct.getPrice());
+        if (storeProduct == null) {
+            throw new RuntimeException("课程信息有误");
         }
-        productDetailResponse.setProductInfo(storeProduct);
+        ProductDetailResponse productDetailResponse = new ProductDetailResponse();
+
 
         // 获取商品规格
         List<StoreProductAttr> attrList = attrService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
@@ -204,48 +197,79 @@ public class ProductServiceImpl implements ProductService {
         for (StoreProductAttrValue storeProductAttrValue : storeProductAttrValues) {
             StoreProductAttrValueResponse atr = new StoreProductAttrValueResponse();
             BeanUtils.copyProperties(storeProductAttrValue, atr);
-            // 设置会员价
-            if (ObjectUtil.isNotNull(userLevel)) {
-                atr.setVipPrice(atr.getPrice());
-            }
             skuMap.put(atr.getSuk(), atr);
         }
         productDetailResponse.setProductValue(skuMap);
+        // 设置商品价格和详情
+        if (storeProduct.getEarlyBirdEndTime() - System.currentTimeMillis() / 1000 > 0) {
+            storeProduct.setVipPrice(storeProduct.getPrice().subtract(storeProduct.getDiscountAmount()));
+            //查询早早鸟活动剩余时间
+                long diffInSeconds = storeProduct.getEarlyBirdEndTime() - System.currentTimeMillis() / 1000;
+                Long days = diffInSeconds / (24 * 60 * 60); // 将秒数转换为天数
+                productDetailResponse.setEarlyBirdOverTime(Integer.parseInt(days.toString()));
 
-        // 用户收藏、分销返佣
-        if (ObjectUtil.isNotNull(user)) {
-            // 查询用户是否收藏收藏
-            user = userService.getInfo();
-            productDetailResponse.setUserCollect(storeProductRelationService.getLikeOrCollectByUser(user.getUid(), id,false).size() > 0);
-            // 判断是否开启分销
-            String brokerageFuncStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_BROKERAGE_FUNC_STATUS);
-            if (brokerageFuncStatus.equals(Constants.COMMON_SWITCH_OPEN)) {// 分销开启
-                // 判断是否开启气泡
-                String isBubble = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_BROKERAGE_IS_BUBBLE);
-                if (isBubble.equals(Constants.COMMON_SWITCH_OPEN)) {
-                    productDetailResponse.setPriceName(getPacketPriceRange(storeProduct.getIsSub(), storeProductAttrValues, user.getIsPromoter()));
-                }
-            }
         } else {
-            productDetailResponse.setUserCollect(false);
+            productDetailResponse.setEarlyBirdOverTime(0);
+            storeProduct.setVipPrice(storeProduct.getPrice());
         }
+        // 当前时间戳
+        Long currentTimestamp = System.currentTimeMillis()/1000;
+
+        // 格式化工具，将时间戳转为日期
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd");
+        Integer startTime = storeProduct.getStartTime();
+        Long startTimeTmp = Long.parseLong(startTime.toString());
+
+        Integer endTime = storeProduct.getEndTime() ;
+        Long endTimeTmp = Long.parseLong(endTime.toString());
+
+
+        // 保存结果的列表
+        List<Map<String, Object>> result = new ArrayList<>();
+        while (startTimeTmp <= endTimeTmp) {
+
+            // 构建结果
+            Map<String, Object> dateInfo = new HashMap<>();
+
+            // 判断是否大于当前时间戳
+//            boolean isAfterCurrentTime = startTimeTmp >= currentTimestamp;
+            if (getZeroTimeStamp(startTimeTmp) < getZeroTimeStamp(currentTimestamp)){
+                dateInfo.put("info", "已结束");
+            }else if (getZeroTimeStamp(startTimeTmp) == getZeroTimeStamp(currentTimestamp)){
+                dateInfo.put("info", "进行中");
+            }else if(getZeroTimeStamp(startTimeTmp) > getZeroTimeStamp(currentTimestamp)){
+                dateInfo.put("info", "即将开始");
+            }
+            dateInfo.put("date", dateFormat.format(startTimeTmp*1000L)); // 转换为日期格式
+            // 添加到结果列表
+            result.add(dateInfo);
+
+            // 时间戳加一天 (86400 秒 = 1 天)
+
+            startTimeTmp+= 86400L;
+
+        }
+
+        productDetailResponse.setOperationPeriod(result);
+        productDetailResponse.setProductInfo(storeProduct);
+
         // 商品活动
         List<ProductActivityItemResponse> activityAllH5 = productUtils.getProductAllActivity(storeProduct);
         productDetailResponse.setActivityAllH5(activityAllH5);
-
-        // 商品浏览量+1
-        StoreProduct updateProduct = new StoreProduct();
-        updateProduct.setId(id);
-        updateProduct.setBrowse(storeProduct.getBrowse() + 1);
-        storeProductService.updateById(updateProduct);
+        // 更新商品浏览量
+        storeProductService.updateById(new StoreProduct() {{
+            setId(id);
+            setBrowse(storeProduct.getBrowse() + 1);
+        }});
 
         // 保存用户访问记录
-        if (userService.getUserId() > 0) {
-            UserVisitRecord visitRecord = new UserVisitRecord();
-            visitRecord.setDate(DateUtil.date().toString("yyyy-MM-dd"));
-            visitRecord.setUid(userService.getUserId());
-            visitRecord.setVisitType(2);
-            userVisitRecordService.save(visitRecord);
+        int userId = userService.getUserId();
+        if (userId > 0) {
+            userVisitRecordService.save(new UserVisitRecord() {{
+                setDate(DateUtil.date().toString("yyyy-MM-dd"));
+                setUid(userId);
+                setVisitType(2);
+            }});
         }
 
         return productDetailResponse;
@@ -536,6 +560,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<StoreProduct> getLeaderboard() {
         return storeProductService.getLeaderboard();
+    }
+
+
+    // 获取零点时间戳的方法
+    public static long getZeroTimeStamp(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp * 1000); // 转为毫秒
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis() / 1000; // 转回秒级时间戳
     }
 
 }

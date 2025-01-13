@@ -11,7 +11,9 @@ import com.github.pagehelper.PageInfo;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * StoreProductService 接口
@@ -210,4 +212,15 @@ public interface StoreProductService extends IService<StoreProduct> {
      * @return List
      */
     List<StoreProduct> getLeaderboard();
+
+
+    /**
+     * 根据月份查询当月是否有课程
+     */
+    List<Map> findProductByMonth(Date date);
+
+    /**
+     * 根据时间获取存在的课程列表
+     */
+    List<StoreProduct> getProductByTime(Integer date);
 }

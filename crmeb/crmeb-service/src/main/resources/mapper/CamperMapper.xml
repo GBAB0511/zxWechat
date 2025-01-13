@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.CamperMapper">
+
+    <!-- 开启二级缓存 -->
+    <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zbkj.common.model.camper.Camper">
+        <id column="id" property="id" />
+        <result column="image" property="image" />
+        <result column="camper_name" property="camperName" />
+        <result column="camper_sex" property="camperSex" />
+        <result column="camper_age" property="camperAge" />
+        <result column="camper_id_type" property="camperIdType" />
+        <result column="camper_id_number" property="camperIdNumber" />
+        <result column="camper_birthday" property="camperBirthday" />
+        <result column="camper_nationality" property="camperNationality" />
+        <result column="camper_height" property="camperHeight" />
+        <result column="camper_weight" property="camperWeight" />
+        <result column="camper_hobby" property="camperHobby" />
+        <result column="camper_health_status" property="camperHealthStatus" />
+        <result column="camper_parent_message" property="camperParentMessage" />
+        <result column="camper_guardian_name" property="camperGuardianName" />
+        <result column="camper_guardian_phone" property="camperGuardianPhone" />
+        <result column="emergency_phone_number" property="emergencyPhoneNumber" />
+        <result column="relationship" property="relationship" />
+        <result column="detailed_address" property="detailedAddress" />
+        <result column="how_to_obtain" property="howToObtain" />
+        <result column="notes" property="notes" />
+        <result column="user_id" property="userId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, image, camper_name, camper_sex, camper_age, camper_id_type, camper_id_number, camper_birthday, camper_nationality, camper_height, camper_weight, camper_hobby, camper_health_status, camper_parent_message,
+camper_guardian_name, camper_guardian_phone, emergency_phone_number, relationship, detailed address, how_to_obtain,
+notes, user_id
+    </sql>
+
+<!-- 添加营员信息-->
+    <insert id="addCamper" parameterType="com.zbkj.common.model.camper.Camper">
+        INSERT INTO eb_user_camper
+        (image, camper_name, camper_sex, camper_age, camper_id_type, camper_id_number, camper_birthday, camper_nationality,
+         camper_height, camper_weight, camper_hobby, camper_health_status, camper_parent_message, camper_guardian_name,
+         camper_guardian_phone, emergency_phone_number, relationship, detailed_address, how_to_obtain, notes, user_id)
+        VALUES
+            (#{image}, #{camperName}, #{camperSex}, #{camperAge}, #{camperIdType}, #{camperIdNumber}, #{camperBirthday},
+             #{camperNationality}, #{camperHeight}, #{camperWeight}, #{camperHobby}, #{camperHealthStatus}, #{camperParentMessage},
+             #{camperGuardianName}, #{camperGuardianPhone}, #{emergencyPhoneNumber}, #{relationship}, #{detailedAddress},
+             #{howToObtain}, #{notes}, #{userId})
+    </insert>
+    <update id="updateCamper" parameterType="com.zbkj.common.model.camper.Camper">
+    UPDATE eb_user_camper
+    <set>
+        <if test="image != null">image = #{image},</if>
+        <if test="camperName != null">camper_name = #{camperName},</if>
+        <if test="camperSex != null">camper_sex = #{camperSex},</if>
+        <if test="camperAge != null">camper_age = #{camperAge},</if>
+        <if test="camperIdType != null">camper_id_type = #{camperIdType},</if>
+        <if test="camperIdNumber != null">camper_id_number = #{camperIdNumber},</if>
+        <if test="camperBirthday != null">camper_birthday = #{camperBirthday},</if>
+        <if test="camperNationality != null">camper_nationality = #{camperNationality},</if>
+        <if test="camperHeight != null">camper_height = #{camperHeight},</if>
+        <if test="camperWeight != null">camper_weight = #{camperWeight},</if>
+        <if test="camperHobby != null">camper_hobby = #{camperHobby},</if>
+        <if test="camperHealthStatus != null">camper_health_status = #{camperHealthStatus},</if>
+        <if test="camperParentMessage != null">camper_parent_message = #{camperParentMessage},</if>
+        <if test="camperGuardianName != null">camper_guardian_name = #{camperGuardianName},</if>
+        <if test="camperGuardianPhone != null">camper_guardian_phone = #{camperGuardianPhone},</if>
+        <if test="emergencyPhoneNumber != null">emergency_phone_number = #{emergencyPhoneNumber},</if>
+        <if test="relationship != null">relationship = #{relationship},</if>
+        <if test="detailedAddress != null">detailed_address = #{detailedAddress},</if>
+        <if test="howToObtain != null">how_to_obtain = #{howToObtain},</if>
+        <if test="notes != null">notes = #{notes}</if>
+    </set>
+    WHERE camper_id = #{camperId}
+    </update>
+    <!-- 根据id删除用户下营员信息-->
+    <delete id="deleteCamper" parameterType="java.lang.Integer">
+        DELETE FROM eb_user_camper
+        WHERE id = #{id}
+    </delete>
+<!--  根据用户id查询营员列表-->
+    <select id="getCamperList" resultType="com.zbkj.common.model.camper.Camper"
+            parameterType="java.lang.Integer">
+        SELECT *
+        FROM eb_user_camper
+        WHERE user_id = #{userId}
+    </select>
+
+
+    <!-- 根据id获取营员信息-->
+    <select id="selectOneCamper" resultType="com.zbkj.common.model.camper.Camper">
+        select * from camper where id = #{id}
+    </select>
+
+
+</mapper>

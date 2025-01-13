@@ -52,8 +52,8 @@ public class StoreProductController {
     @PreAuthorize("hasAuthority('admin:product:list')")
     @ApiOperation(value = "分页列表") //配合swagger使用
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public CommonResult<CommonPage<StoreProductResponse>> getList(@Validated StoreProductSearchRequest request,
-                                                                  @Validated PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<StoreProductResponse>> getList( StoreProductSearchRequest request,
+                                                                   PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(storeProductService.getAdminList(request, pageParamRequest)));
     }
 

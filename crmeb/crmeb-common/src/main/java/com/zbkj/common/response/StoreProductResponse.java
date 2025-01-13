@@ -193,17 +193,17 @@ public class StoreProductResponse implements Serializable {
     @ApiModelProperty(value = "时间段ID")
     private Integer timeId;
 
-    @ApiModelProperty(value = "最多秒杀几个")
-    private Integer num;
+//    @ApiModelProperty(value = "最多秒杀几个")
+//    private Integer num;
 
-    @ApiModelProperty(value = "开始时间")
-    private Date startTime;
+//    @ApiModelProperty(value = "开始时间")
+//    private Date startTime;
 
-    @ApiModelProperty(value = "结束时间")
-    private Date stopTime;
+//    @ApiModelProperty(value = "结束时间")
+//    private Date stopTime;
 
-    @ApiModelProperty(value = "开始时间")
-    private String startTimeStr;
+//    @ApiModelProperty(value = "开始时间")
+//    private String startTimeStr;
 
     @ApiModelProperty(value = "结束时间")
     private String stopTimeStr;
@@ -251,6 +251,42 @@ public class StoreProductResponse implements Serializable {
     @ApiModelProperty(value = "砍价商品最低价")
     private BigDecimal minPrice;
 
-    @ApiModelProperty(value = "砍价结束时间")
-    private Long endTime;
+//    @ApiModelProperty(value = "砍价结束时间")
+//    private Long endTime;
+
+
+    @ApiModelProperty(value = "开始时间")
+    private Date startTime;
+
+    @ApiModelProperty(value = "结束时间")
+    private Date endTime;
+
+    @ApiModelProperty(value = "活动地址")
+    private String address;
+
+    @ApiModelProperty(value = "适龄区间")
+    private String tips;
+
+    @ApiModelProperty(value = "剩余时间")
+    private Integer duration;
+
+
+    @ApiModelProperty(value = "启程集合点")
+    private String departureAssemblyPoint;
+
+    @ApiModelProperty(value = "返程集合点")
+    private String returnGatheringPoint;
+
+
+    @ApiModelProperty(value = "早早鸟开始时间")
+    private Date earlyBirdStartTime;
+
+    @ApiModelProperty(value = "早早鸟结束时间")
+    private Date earlyBirdEndTime;
+
+    @ApiModelProperty(value = "优惠金额")
+    private BigDecimal discountAmount;
+
+    @ApiModelProperty(value = "早早鸟剩余时间")
+    private Long lastTime;
 }

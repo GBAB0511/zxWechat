@@ -127,7 +127,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 break;
             case 2:
                 //仓库中（未上架）
-                lambdaQueryWrapper.eq(StoreProduct::getIsShow, false);
+//                lambdaQueryWrapper.eq(StoreProduct::getIsShow, true);
                 lambdaQueryWrapper.eq(StoreProduct::getIsRecycle, false);
                 lambdaQueryWrapper.eq(StoreProduct::getIsDel, false);
                 break;
@@ -429,7 +429,19 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
 
         StoreProduct storeProduct = new StoreProduct();
         BeanUtils.copyProperties(storeProductRequest, storeProduct);
-
+        Integer secondTimestamp = DateUtil.getSecondTimestamp(storeProductRequest.getEarlyBirdStartTime());
+        System.out.println("早早鸟开始时间"+secondTimestamp);
+        storeProduct.setEarlyBirdStartTime(secondTimestamp);
+        Integer secondTimestamp1 = DateUtil.getSecondTimestamp(storeProductRequest.getEarlyBirdEndTime());
+        storeProduct.setEarlyBirdEndTime(secondTimestamp1);
+        System.out.println("早早鸟结束时间"+secondTimestamp1);
+        storeProduct.setStock(storeProductRequest.getStock());
+        Integer secondTimestamp2 = DateUtil.getSecondTimestamp(storeProductRequest.getStartTime());
+        storeProduct.setStartTime(secondTimestamp2);
+        System.out.println("活动开始时间"+secondTimestamp2);
+        Integer secondTimestamp3 = DateUtil.getSecondTimestamp(storeProductRequest.getEndTime());
+        storeProduct.setEndTime(secondTimestamp3);
+        System.out.println("活动结束时间"+secondTimestamp3);
         // 设置Activity活动
         storeProduct.setActivity(getProductActivityStr(storeProductRequest.getActivity()));
 
@@ -445,7 +457,6 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         storeProduct.setPrice(minAttrValue.getPrice());
         storeProduct.setOtPrice(minAttrValue.getOtPrice());
         storeProduct.setCost(minAttrValue.getCost());
-        storeProduct.setStock(attrValueAddRequestList.stream().mapToInt(StoreProductAttrValueAddRequest::getStock).sum());
 
         // attr部分
         List<StoreProductAttrAddRequest> addRequestList = storeProductRequest.getAttr();
@@ -543,6 +554,8 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         StoreProduct storeProduct = dao.selectById(id);
         if (null == storeProduct) throw new CrmebException("未找到对应商品信息");
         StoreProductResponse storeProductResponse = new StoreProductResponse();
+        storeProductResponse.setEarlyBirdStartTime(new Date(storeProduct.getEarlyBirdStartTime()*1000));
+        storeProductResponse.setEarlyBirdEndTime(new Date(storeProduct.getEarlyBirdEndTime()*1000));
         BeanUtils.copyProperties(storeProduct, storeProductResponse);
         StoreProductAttr spaPram = new StoreProductAttr();
         spaPram.setProductId(storeProduct.getId()).setType(Constants.PRODUCT_TYPE_NORMAL);
@@ -636,11 +649,18 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     @Override
     public StoreProductInfoResponse getInfo(Integer id) {
         StoreProduct storeProduct = dao.selectById(id);
+        System.out.println(storeProduct+"+++++++++++++++++++++++++++++storeProduct");
         if (ObjectUtil.isNull(storeProduct)) {
             throw new CrmebException("未找到对应商品信息");
         }
 
         StoreProductInfoResponse storeProductResponse = new StoreProductInfoResponse();
+        Date date = DateUtil.timeStamp10ToDate(storeProduct.getEarlyBirdStartTime());
+        System.out.println(date+"早早鸟开始时间date");
+        storeProductResponse.setEarlyBirdStartTime(date);
+        storeProductResponse.setEarlyBirdEndTime(DateUtil.timeStamp10ToDate(storeProduct.getEarlyBirdEndTime()));
+        storeProductResponse.setStartTime(DateUtil.timeStamp10ToDate(storeProduct.getStartTime()));
+        storeProductResponse.setEndTime(DateUtil.timeStamp10ToDate(storeProduct.getEndTime()));
         BeanUtils.copyProperties(storeProduct, storeProductResponse);
 
         // 设置商品所参与的活动
@@ -1111,8 +1131,29 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     public List<StoreProduct> getIndexProduct(Integer type, PageParamRequest pageParamRequest) {
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<StoreProduct> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName,
-                StoreProduct::getPrice, StoreProduct::getOtPrice, StoreProduct::getActivity);
+//        lambdaQueryWrapper.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName,
+//                StoreProduct::getPrice, StoreProduct::getOtPrice, StoreProduct::getActivity);
+        // 选择需要查询的字段，包括新增的字段
+        lambdaQueryWrapper.select(
+                StoreProduct::getId,                            // 商品ID
+                StoreProduct::getImage,                         // 商品图片
+                StoreProduct::getStoreName,                     // 商店名称
+                StoreProduct::getPrice,                         // 商品价格
+                StoreProduct::getOtPrice,                       // 商品原价
+                StoreProduct::getActivity,                      // 活动
+                StoreProduct::getStartTime,                     // 开始时间
+                StoreProduct::getEndTime,                       // 结束时间
+                StoreProduct::getAddress,                       // 活动地址
+                StoreProduct::getTips,                          // 适龄区间
+                StoreProduct::getDepartureAssemblyPoint,       // 启程集合点
+                StoreProduct::getReturnGatheringPoint,         // 返程集合点
+                StoreProduct::getEarlyBirdStartTime,           // 早鸟开始时间
+                StoreProduct::getEarlyBirdEndTime,             // 早鸟结束时间
+                StoreProduct::getDiscountAmount,              // 优惠金额
+                StoreProduct::getIsSeckill    ,             // 秒杀状态
+                StoreProduct::getVipPrice                  // 会员价格
+        );
+
         switch (type) {
             case Constants.INDEX_RECOMMEND_BANNER: //精品推荐
                 lambdaQueryWrapper.eq(StoreProduct::getIsBest, true);
@@ -1210,9 +1251,66 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     @Override
     public StoreProduct getH5Detail(Integer id) {
         LambdaQueryWrapper<StoreProduct> lqw = Wrappers.lambdaQuery();
-        lqw.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName, StoreProduct::getSliderImage,
-                StoreProduct::getOtPrice, StoreProduct::getStock, StoreProduct::getSales, StoreProduct::getPrice, StoreProduct::getActivity,
-                StoreProduct::getFicti, StoreProduct::getIsSub, StoreProduct::getStoreInfo, StoreProduct::getBrowse, StoreProduct::getUnitName);
+//        lqw.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName, StoreProduct::getSliderImage,
+//                StoreProduct::getOtPrice, StoreProduct::getStock, StoreProduct::getSales, StoreProduct::getPrice, StoreProduct::getActivity,
+//                StoreProduct::getFicti, StoreProduct::getIsSub, StoreProduct::getStoreInfo, StoreProduct::getBrowse, StoreProduct::getUnitName,StoreProduct ::getFlatPattern, StoreProduct ::getVipPrice, StoreProduct ::getDiscountAmount, StoreProduct ::getIsSeckill, StoreProduct ::getIsBargain, StoreProduct ::getIsGood);
+        // 查询所有字段
+        lqw.select(StoreProduct::getId,
+                StoreProduct::getMerId,
+                StoreProduct::getImage,
+                StoreProduct::getSliderImage,
+                StoreProduct::getStoreName,
+                StoreProduct::getStoreInfo,
+                StoreProduct::getKeyword,
+                StoreProduct::getBarCode,
+                StoreProduct::getCateId,
+                StoreProduct::getPrice,
+                StoreProduct::getVipPrice,
+                StoreProduct::getOtPrice,
+                StoreProduct::getPostage,
+                StoreProduct::getUnitName,
+                StoreProduct::getSort,
+                StoreProduct::getSales,
+                StoreProduct::getStock,
+                StoreProduct::getIsShow,
+                StoreProduct::getIsHot,
+                StoreProduct::getIsBenefit,
+                StoreProduct::getIsBest,
+                StoreProduct::getIsNew,
+                StoreProduct::getAddTime,
+                StoreProduct::getIsPostage,
+                StoreProduct::getIsRecycle,
+                StoreProduct::getIsDel,
+                StoreProduct::getMerUse,
+                StoreProduct::getGiveIntegral,
+                StoreProduct::getCost,
+                StoreProduct::getIsSeckill,
+                StoreProduct::getIsBargain,
+                StoreProduct::getIsGood,
+                StoreProduct::getIsSub,
+                StoreProduct::getFicti,
+                StoreProduct::getBrowse,
+                StoreProduct::getCodePath,
+                StoreProduct::getSoureLink,
+                StoreProduct::getVideoLink,
+                StoreProduct::getTempId,
+                StoreProduct::getSpecType,
+                StoreProduct::getActivity,
+                StoreProduct::getFlatPattern,
+//                StoreProduct::getContent,
+                StoreProduct::getStartTime,
+                StoreProduct::getEndTime,
+                StoreProduct::getAddress,
+                StoreProduct::getTips,
+                StoreProduct::getDepartureAssemblyPoint,
+                StoreProduct::getReturnGatheringPoint,
+                StoreProduct::getEarlyBirdStartTime,
+                StoreProduct::getEarlyBirdEndTime,
+                StoreProduct::getDiscountAmount,
+                StoreProduct::getCourseContent,
+                StoreProduct::getTransportation,
+                StoreProduct::getCostDescription,
+                StoreProduct::getSecurityGuarantee);
         lqw.eq(StoreProduct::getId, id);
         lqw.eq(StoreProduct::getIsRecycle, false);
         lqw.eq(StoreProduct::getIsDel, false);
@@ -1323,6 +1421,37 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         lambdaQueryWrapper.eq(StoreProduct::getIsRecycle, false);
         lambdaQueryWrapper.eq(StoreProduct::getIsDel, false);
         return dao.selectCount(lambdaQueryWrapper);
+    }
+
+    @Override
+    public List<StoreProduct> getProductByTime(Integer date) {
+        // 构建查询条件
+        QueryWrapper<StoreProduct> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("start_time", date); // 假设数据库中存储日期的字段名是 `start_time`
+        // 执行查询
+        System.out.println(dao.selectList(queryWrapper).size()+"查询的数量为");
+        return  dao.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<Map> findProductByMonth(Date date) {
+        long[] monthStartAndEndTimestamps = DateUtil.getMonthStartAndEndTimestamps(date);
+        // 构建查询条件
+        LambdaQueryWrapper<StoreProduct> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.ge(StoreProduct::getStartTime, monthStartAndEndTimestamps[0]) // 开始时间 >= 月初时间
+//                .le(StoreProduct::getEndTime, monthStartAndEndTimestamps[1])   // 结束时间 <= 月末时间
+                .eq(StoreProduct::getIsShow, 1);
+        List<StoreProduct> storeProducts = dao.selectList(queryWrapper);
+        List<Map> mapList = new ArrayList<>();
+        for (StoreProduct storeProduct : storeProducts) {
+            Map<String, String> respMap = new HashMap<>();
+            respMap.put("date",storeProduct.getStartTime().toString());
+            respMap.put("info",storeProduct.getStoreName());
+            mapList.add(respMap);
+        }
+
+        return mapList;
+
     }
 
     /**

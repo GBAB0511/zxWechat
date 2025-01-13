@@ -42,6 +42,7 @@ public class QrCodeController {
     @ApiOperation(value="获取二维码")
     @RequestMapping(value = "/get", method = RequestMethod.POST)
     public CommonResult<Map<String, Object>> get(@RequestBody JSONObject data) {
+        System.out.println(data+"生成二维码获取到的数据是+++++++++++++++++++++");
         return CommonResult.success(qrCodeService.get(data));
     }
 

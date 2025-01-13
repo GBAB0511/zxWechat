@@ -632,4 +632,46 @@ public final class DateUtil {
         System.out.println(dateLimit.getEndTime());
     }
 
+    /**
+     * 获取指定日期所在月份的起始和结束时间
+     *
+     * @param date 指定日期
+     * @return 返回一个包含该月起始时间和结束时间的数组
+     */
+    public static long[] getMonthStartAndEndTimestamps(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        // 获取当前月份的第一天
+        calendar.set(Calendar.DAY_OF_MONTH, 1); // 设置为该月第一天
+        calendar.set(Calendar.HOUR_OF_DAY, 0);  // 设置为00:00:00
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date monthStart = calendar.getTime();
+
+        // 获取当前月份的最后一天
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH)); // 设置为该月最后一天
+        calendar.set(Calendar.HOUR_OF_DAY, 23);  // 设置为23:59:59
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        Date monthEnd = calendar.getTime();
+
+        // 获取时间戳（秒级）
+        long monthStartTimestamp = monthStart.getTime() / 1000; // 毫秒转秒
+        long monthEndTimestamp = monthEnd.getTime() / 1000; // 毫秒转秒
+
+        return new long[]{monthStartTimestamp, monthEndTimestamp};
+    }
+
+    /**
+     * convert long to date
+     *
+     * @param date 待转换时间戳
+     * @return 转换后时间
+     */
+    public static Date timeStamp10ToDate(Integer date) {
+        return new Date((long) date * 1000);  // 将秒级时间戳转换为毫秒级时间戳
+    }
 }

@@ -271,10 +271,10 @@ public class OrderPayServiceImpl implements OrderPayService {
             try {
                 SystemNotification payNotification = systemNotificationService.getByMark(NotifyConstants.PAY_SUCCESS_MARK);
                 // 发送短信
-                if (StrUtil.isNotBlank(user.getPhone()) && payNotification.getIsSms().equals(1)) {
-                    SmsTemplate smsTemplate = smsTemplateService.getDetail(payNotification.getSmsId());
-                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderId(), storeOrder.getPayPrice(), Integer.valueOf(smsTemplate.getTempId()));
-                }
+//                if (StrUtil.isNotBlank(user.getPhone()) && payNotification.getIsSms().equals(1)) {
+//                    SmsTemplate smsTemplate = smsTemplateService.getDetail(payNotification.getSmsId());
+//                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderId(), storeOrder.getPayPrice(), Integer.valueOf(smsTemplate.getTempId()));
+//                }
 
                 // 发送用户支付成功管理员提醒短信
                 SystemNotification payAdminNotification = systemNotificationService.getByMark(NotifyConstants.PAY_SUCCESS_ADMIN_MARK);

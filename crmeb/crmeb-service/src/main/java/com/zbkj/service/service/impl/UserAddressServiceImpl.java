@@ -4,12 +4,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zbkj.common.model.camper.Camper;
 import com.zbkj.common.request.PageParamRequest;
 import com.zbkj.common.exception.CrmebException;
 import com.zbkj.common.request.UserAddressRequest;
 import com.github.pagehelper.PageHelper;
 import com.zbkj.common.model.system.SystemCity;
 import com.zbkj.common.model.user.UserAddress;
+import com.zbkj.service.dao.CamperMapper;
 import com.zbkj.service.dao.UserAddressDao;
 import com.zbkj.service.service.SystemCityService;
 import com.zbkj.service.service.UserAddressService;
@@ -36,6 +38,9 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
 
     @Autowired
     private UserService userService;
+
+    @Resource
+    private CamperMapper camperMapper;
 
     /**
     * 列表
