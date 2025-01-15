@@ -216,41 +216,41 @@ public class ProductServiceImpl implements ProductService {
         Long currentTimestamp = System.currentTimeMillis()/1000;
 
         // 格式化工具，将时间戳转为日期
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd");
-        Integer startTime = storeProduct.getStartTime();
-        Long startTimeTmp = Long.parseLong(startTime.toString());
-
-        Integer endTime = storeProduct.getEndTime() ;
-        Long endTimeTmp = Long.parseLong(endTime.toString());
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd");
+//        Integer startTime = storeProduct.getStartTime();
+//        Long startTimeTmp = Long.parseLong(startTime.toString());
+//
+//        Integer endTime = storeProduct.getEndTime() ;
+//        Long endTimeTmp = Long.parseLong(endTime.toString());
 
 
         // 保存结果的列表
-        List<Map<String, Object>> result = new ArrayList<>();
-        while (startTimeTmp <= endTimeTmp) {
-
-            // 构建结果
-            Map<String, Object> dateInfo = new HashMap<>();
-
-            // 判断是否大于当前时间戳
-//            boolean isAfterCurrentTime = startTimeTmp >= currentTimestamp;
-            if (getZeroTimeStamp(startTimeTmp) < getZeroTimeStamp(currentTimestamp)){
-                dateInfo.put("info", "已结束");
-            }else if (getZeroTimeStamp(startTimeTmp) == getZeroTimeStamp(currentTimestamp)){
-                dateInfo.put("info", "进行中");
-            }else if(getZeroTimeStamp(startTimeTmp) > getZeroTimeStamp(currentTimestamp)){
-                dateInfo.put("info", "即将开始");
-            }
-            dateInfo.put("date", dateFormat.format(startTimeTmp*1000L)); // 转换为日期格式
-            // 添加到结果列表
-            result.add(dateInfo);
-
-            // 时间戳加一天 (86400 秒 = 1 天)
-
-            startTimeTmp+= 86400L;
-
-        }
-
-        productDetailResponse.setOperationPeriod(result);
+//        List<Map<String, Object>> result = new ArrayList<>();
+//        while (startTimeTmp <= endTimeTmp) {
+//
+//            // 构建结果
+//            Map<String, Object> dateInfo = new HashMap<>();
+//
+//            // 判断是否大于当前时间戳
+////            boolean isAfterCurrentTime = startTimeTmp >= currentTimestamp;
+//            if (getZeroTimeStamp(startTimeTmp) < getZeroTimeStamp(currentTimestamp)){
+//                dateInfo.put("info", "已结束");
+//            }else if (getZeroTimeStamp(startTimeTmp) == getZeroTimeStamp(currentTimestamp)){
+//                dateInfo.put("info", "进行中");
+//            }else if(getZeroTimeStamp(startTimeTmp) > getZeroTimeStamp(currentTimestamp)){
+//                dateInfo.put("info", "即将开始");
+//            }
+//            dateInfo.put("date", dateFormat.format(startTimeTmp*1000L)); // 转换为日期格式
+//            // 添加到结果列表
+//            result.add(dateInfo);
+//
+//            // 时间戳加一天 (86400 秒 = 1 天)
+//
+//            startTimeTmp+= 86400L;
+//
+//        }
+//
+//        productDetailResponse.setOperationPeriod(result);
         productDetailResponse.setProductInfo(storeProduct);
 
         // 商品活动

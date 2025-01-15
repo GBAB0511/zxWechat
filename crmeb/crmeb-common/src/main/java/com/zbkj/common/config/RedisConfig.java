@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -32,6 +33,9 @@ public class RedisConfig {
 
     @Value("${spring.redis.port}")
     private int redisPort;
+
+    @Value("${spring.redis.password}")
+    private RedisPassword password;
 
     @Value("${spring.redis.database}")
     private int redisDb;
@@ -71,6 +75,7 @@ public class RedisConfig {
         redisStandaloneConfiguration.setPort(redisPort);
         redisStandaloneConfiguration.setHostName(redisHost);
         redisStandaloneConfiguration.setDatabase(redisDb);
+        redisStandaloneConfiguration.setPassword(password);
         //获得默认的连接池构造
         //这里需要注意的是，RedisConnectionFactoryJ对于Standalone模式的没有（RedisStandaloneConfiguration，jedisPoolConfig）的构造函数，对此
         //我们用JedisClientConfiguration接口的builder方法实例化一个构造器，还得类型转换

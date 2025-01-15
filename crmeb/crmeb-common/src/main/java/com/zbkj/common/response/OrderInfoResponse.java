@@ -1,5 +1,6 @@
 package com.zbkj.common.response;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,8 +21,8 @@ public class OrderInfoResponse implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-//    @ApiModelProperty(value = "订单id")
-//    private Integer orderId;
+    @ApiModelProperty(value = "订单id")
+    private Integer orderId;
     @ApiModelProperty(value = "attrId")
     private Integer attrId;
 
@@ -34,9 +35,9 @@ public class OrderInfoResponse implements Serializable {
     @ApiModelProperty(value = "商品数量")
     private Integer cartNum;
 
-//    @ApiModelProperty(value = "唯一id")
-//    @TableField(value = "`unique`")
-//    private String unique;
+    @ApiModelProperty(value = "唯一id")
+    @TableField(value = "`unique`")
+    private String unique;
 
     @ApiModelProperty(value = "商品图片")
     private String image;

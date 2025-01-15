@@ -41,16 +41,16 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://47.113.195.163:13306/mall?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
-    url: jdbc:mysql://127.0.0.1:3306/cremb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+    url: jdbc:mysql://47.113.195.163:13306/mall?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+#    url: jdbc:mysql://127.0.0.1:3306/cremb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
     username: root
-    password: 123456
-
-#    password: Dxang.com123
+    password: Dxang.com123
 
   redis:
-    host: localhost #地址
-    port: 6379 #端口
+    host: 47.113.195.163 #地址
+#    host: 127.0.0.1
+    port: 16379 #端口
+    password: ruoyi123
     timeout: 10000 # 连接超时时间（毫秒）
     database: 1 #默认数据库
     jedis:
@@ -60,15 +60,15 @@ spring:
         max-idle: 10 # 连接池中的最大空闲连接
         min-idle: 0 # 连接池中的最小空闲连接
         time-between-eviction-runs: -1 #逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
-
-
 debug: true
 logging:
   level:
     io.swagger.*: error
     com.zbjk.crmeb: debug
     org.springframework.boot.autoconfigure: ERROR
+    redis.clients.jedis: debug # 增加 Redis 客户端日志
   config: classpath:logback-spring.xml
+
   file:
     path: ./crmeb_log
 

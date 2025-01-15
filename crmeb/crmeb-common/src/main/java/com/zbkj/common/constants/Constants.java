@@ -372,11 +372,11 @@ public class Constants {
     public static final String ORDER_STATUS_REFUNDED = "refunded"; //已退款
     public static final String ORDER_STATUS_DELETED = "deleted"; //已删除
 
-    public static final String ORDER_STATUS_STR_UNPAID = "未支付"; //未支付
-    public static final String ORDER_STATUS_STR_NOT_SHIPPED = "未发货"; //未发货
-    public static final String ORDER_STATUS_STR_SPIKE = "待收货"; //待收货
+    public static final String ORDER_STATUS_STR_UNPAID = "待支付"; //未支付
+    public static final String ORDER_STATUS_STR_NOT_SHIPPED = "待使用"; //未发货
+    public static final String ORDER_STATUS_STR_SPIKE = "待确认"; //待收货
     public static final String ORDER_STATUS_STR_BARGAIN = "待评价"; //已收货待评价
-    public static final String ORDER_STATUS_STR_TAKE = "用户已收货"; //用户已收货
+    public static final String ORDER_STATUS_STR_TAKE = "已完成"; //用户已收货
     public static final String ORDER_STATUS_STR_COMPLETE = "交易完成"; //交易完成
     public static final String ORDER_STATUS_STR_TOBE_WRITTEN_OFF = "待核销"; //待核销
     public static final String ORDER_STATUS_STR_APPLY_REFUNDING = "申请退款"; //申请退款

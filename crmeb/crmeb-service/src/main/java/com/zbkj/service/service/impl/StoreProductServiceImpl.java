@@ -253,6 +253,11 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
 
         //轮播图
         storeProduct.setSliderImage(systemAttachmentService.clearPrefix(storeProduct.getSliderImage()));
+
+        storeProduct.setCourseContent(systemAttachmentService.clearPrefix(storeProduct.getCourseContent()));
+        storeProduct.setTransportation(systemAttachmentService.clearPrefix(storeProduct.getTransportation()));
+        storeProduct.setCostDescription(systemAttachmentService.clearPrefix(storeProduct.getCostDescription()));
+        storeProduct.setSecurityGuarantee(systemAttachmentService.clearPrefix(storeProduct.getSecurityGuarantee()));
         // 展示图
         if (StrUtil.isNotEmpty(storeProduct.getFlatPattern())) {
             storeProduct.setFlatPattern(systemAttachmentService.clearPrefix(storeProduct.getFlatPattern()));
@@ -430,18 +435,15 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         StoreProduct storeProduct = new StoreProduct();
         BeanUtils.copyProperties(storeProductRequest, storeProduct);
         Integer secondTimestamp = DateUtil.getSecondTimestamp(storeProductRequest.getEarlyBirdStartTime());
-        System.out.println("早早鸟开始时间"+secondTimestamp);
         storeProduct.setEarlyBirdStartTime(secondTimestamp);
         Integer secondTimestamp1 = DateUtil.getSecondTimestamp(storeProductRequest.getEarlyBirdEndTime());
         storeProduct.setEarlyBirdEndTime(secondTimestamp1);
-        System.out.println("早早鸟结束时间"+secondTimestamp1);
         storeProduct.setStock(storeProductRequest.getStock());
         Integer secondTimestamp2 = DateUtil.getSecondTimestamp(storeProductRequest.getStartTime());
         storeProduct.setStartTime(secondTimestamp2);
-        System.out.println("活动开始时间"+secondTimestamp2);
         Integer secondTimestamp3 = DateUtil.getSecondTimestamp(storeProductRequest.getEndTime());
         storeProduct.setEndTime(secondTimestamp3);
-        System.out.println("活动结束时间"+secondTimestamp3);
+
         // 设置Activity活动
         storeProduct.setActivity(getProductActivityStr(storeProductRequest.getActivity()));
 
@@ -450,6 +452,11 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
 
         //轮播图
         storeProduct.setSliderImage(systemAttachmentService.clearPrefix(storeProduct.getSliderImage()));
+
+        storeProduct.setCourseContent(systemAttachmentService.clearPrefix(storeProductRequest.getCourseContent()));
+        storeProduct.setTransportation(systemAttachmentService.clearPrefix(storeProductRequest.getTransportation()));
+        storeProduct.setCostDescription(systemAttachmentService.clearPrefix(storeProductRequest.getCostDescription()));
+        storeProduct.setSecurityGuarantee(systemAttachmentService.clearPrefix(storeProductRequest.getSecurityGuarantee()));
 
         List<StoreProductAttrValueAddRequest> attrValueAddRequestList = storeProductRequest.getAttrValue();
         //计算价格

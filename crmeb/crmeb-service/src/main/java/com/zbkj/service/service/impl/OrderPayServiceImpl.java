@@ -199,7 +199,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         // 商品赠送积分
         // 查询订单详情
         // 获取商品额外赠送积分
-        List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
+        List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getId().toString());
         if (orderInfoList.get(0).getProductType().equals(0)) {
             List<Integer> productIds = orderInfoList.stream().map(StoreOrderInfo::getProductId).collect(Collectors.toList());
             if (productIds.size() > 0) {

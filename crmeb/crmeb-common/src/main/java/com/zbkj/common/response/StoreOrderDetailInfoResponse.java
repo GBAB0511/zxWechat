@@ -1,5 +1,6 @@
 package com.zbkj.common.response;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.zbkj.common.model.system.SystemStore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -134,15 +135,15 @@ public class StoreOrderDetailInfoResponse implements Serializable {
     @ApiModelProperty(value = "备注")
     private String mark;
 
-//    @ApiModelProperty(value = "是否删除")
-//    private Boolean isDel;
+    @ApiModelProperty(value = "是否删除")
+    private Boolean isDel;
 
-//    @ApiModelProperty(value = "唯一id(md5加密)类似id")
-//    @TableField(value = "`unique`")
-//    private String unique;
+    @ApiModelProperty(value = "唯一id(md5加密)类似id")
+    @TableField(value = "`unique`")
+    private String unique;
 
-//    @ApiModelProperty(value = "管理员备注")
-//    private String remark;
+    @ApiModelProperty(value = "管理员备注")
+    private String remark;
 
 //    @ApiModelProperty(value = "商户ID")
 //    private Integer merId;

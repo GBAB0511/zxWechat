@@ -535,6 +535,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfoResponse.setIsReply(e.getIsReply() ? 1 : 0);
             orderInfoResponse.setAttrId(e.getAttrValueId());
             orderInfoResponse.setSku(e.getSku());
+            orderInfoResponse.setUnique(e.getUnique());
             infoResponseList.add(orderInfoResponse);
         });
         storeOrderDetailResponse.setOrderInfoList(infoResponseList);
@@ -819,9 +820,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderInfoVo.getOrderDetailList().get(0).getProductType().equals(Constants.PRODUCT_TYPE_NORMAL)) {
             // 普通商品
             StoreProductResponse byProductId = storeProductService.getByProductId(orderInfoVo.getOrderDetailList().get(0).getProductId());
-            if (byProductId!=null){
 
-            }
             if (request.getBirdStatus()==1){
                 totalPrice = orderInfoVo.getOrderDetailList().stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add).subtract(byProductId.getDiscountAmount());
                 orderInfoVo.getOrderDetailList().get(0).setPrice(totalPrice);
