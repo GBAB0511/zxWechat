@@ -203,4 +203,8 @@ public class StoreProduct implements Serializable {
     @ApiModelProperty(value = "安全保障")
     private String securityGuarantee;
 
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
+
+
 }

@@ -11,10 +11,11 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author wrg
- * @since 2024-12-27
+ * @since 2024-12-23 16:04:04
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -48,7 +49,7 @@ public class Camper implements Serializable {
     private String camperIdNumber;
 
     @ApiModelProperty(value = "生日信息")
-    private LocalDateTime camperBirthday;
+    private Date camperBirthday;
 
     @ApiModelProperty(value = "民族")
     private String camperNationality;

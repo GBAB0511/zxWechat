@@ -89,4 +89,7 @@ public class OrderInfoVo {
 
     @ApiModelProperty(value = "是否视频号订单")
     private Boolean isVideo = false;
+
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
 }

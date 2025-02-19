@@ -38,4 +38,6 @@ public class StoreOrderInfoOldVo implements Serializable {
 
 
 
+
+
 }

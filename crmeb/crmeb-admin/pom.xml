@@ -14,13 +14,20 @@
 
     <properties>
         <crmeb-service>0.0.1-SNAPSHOT</crmeb-service>
+        <crmeb-common>0.0.1-SNAPSHOT</crmeb-common>
     </properties>
+
 
     <dependencies>
         <dependency>
             <groupId>com.zbkj</groupId>
             <artifactId>crmeb-service</artifactId>
             <version>${crmeb-service}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zbkj</groupId>
+            <artifactId>crmeb-common</artifactId>
+            <version>${crmeb-common}</version>
         </dependency>
     </dependencies>
 

@@ -1,6 +1,7 @@
 package com.zbkj.service.service;
 
 import com.zbkj.common.model.finance.UserRecharge;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public interface WeChatPayService {
      * @param orderNo 订单编号
      * @return
      */
+    @Transactional
     Boolean queryPayResult(String orderNo);
 
     /**

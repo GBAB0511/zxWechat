@@ -53,4 +53,14 @@ public class OrderInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "规格属性值")
     private String sku;
+
+    @ApiModelProperty(value = "拼团商品id0一般商品")
+    private Integer combinationId;
+
+    @ApiModelProperty(value = "拼团id 0没有拼团")
+    private Integer pinkId;
+
+
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
 }

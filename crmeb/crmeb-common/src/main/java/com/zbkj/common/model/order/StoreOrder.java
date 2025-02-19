@@ -199,4 +199,7 @@ public class StoreOrder implements Serializable {
 
     @ApiModelProperty(value = "商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号")
     private String outTradeNo;
+
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
 }

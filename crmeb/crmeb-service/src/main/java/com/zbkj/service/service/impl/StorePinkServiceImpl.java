@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zbkj.common.constants.NotifyConstants;
@@ -354,14 +355,30 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
      * 获取最后3个拼团信息（不同用户）
      * @return List
      */
+//    @Override
+//    public List<StorePink> findSizePink(Integer size) {
+//        LambdaQueryWrapper<StorePink> lqw = new LambdaQueryWrapper<>();
+//        lqw.eq(StorePink::getIsRefund, false);
+//        lqw.in(StorePink::getStatus, 1, 2);
+//        lqw.groupBy(StorePink::getUid);
+//        lqw.orderByDesc(StorePink::getId);
+//        lqw.last(" limit " + size);
+//        return dao.selectList(lqw);
+//    }
     @Override
     public List<StorePink> findSizePink(Integer size) {
         LambdaQueryWrapper<StorePink> lqw = new LambdaQueryWrapper<>();
         lqw.eq(StorePink::getIsRefund, false);
         lqw.in(StorePink::getStatus, 1, 2);
-        lqw.groupBy(StorePink::getUid);
+
+        // 使用子查询来获取每个用户的最新拼团记录
+        String subQuery = "SELECT MAX(id) FROM eb_store_pink WHERE uid = eb_store_pink.uid AND is_refund = false AND status IN (1, 2) GROUP BY uid";
+        lqw.inSql(StorePink::getId, subQuery);
+
+        // 排序并限制结果数量
         lqw.orderByDesc(StorePink::getId);
-        lqw.last(" limit " + size);
+        lqw.last("LIMIT " + size);
+
         return dao.selectList(lqw);
     }
 
@@ -385,5 +402,15 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
         lqw.eq(StorePink::getIsRefund, false);
         return dao.selectCount(lqw);
     }
+
+    @Override
+    // StorePinkService.java
+    public StorePink getByProductId(Integer productId) {
+        // 使用 MyBatis-Plus 的查询方式，条件查询
+        QueryWrapper<StorePink> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("product_id", productId); // 查询条件：product_id = productId
+        return dao.selectOne(queryWrapper); // 返回查询结果
+    }
+
 }
 

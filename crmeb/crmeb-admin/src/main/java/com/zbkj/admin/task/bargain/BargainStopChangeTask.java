@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Configuration //读取配置
-@EnableScheduling // 2.开启定时任务
+//@EnableScheduling // 2.开启定时任务
 public class BargainStopChangeTask {
 
     //日志

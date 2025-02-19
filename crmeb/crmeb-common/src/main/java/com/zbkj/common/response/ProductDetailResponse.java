@@ -53,8 +53,6 @@ public class ProductDetailResponse implements Serializable {
 
 
     @ApiModelProperty(value = "营期")
-    private List<Map<String, Object>> operationPeriod;
+    private String operationPeriod;
 
-//    @ApiModelProperty(value = "收藏标识")
-//    private Boolean userCollect;
 }

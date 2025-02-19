@@ -53,7 +53,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
 
     private Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
-    @Resource
+    @Autowired
     private ArticleDao dao;
 
     @Autowired

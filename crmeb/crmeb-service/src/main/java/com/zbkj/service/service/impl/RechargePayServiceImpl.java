@@ -63,9 +63,11 @@ public class RechargePayServiceImpl implements RechargePayService {
         userBill.setStatus(1);
         userBill.setCreateTime(DateUtil.nowDateTime());
 
+
         Boolean execute = transactionTemplate.execute(e -> {
             // 订单变动
-            userRechargeService.updateById(userRecharge);
+            boolean b = userRechargeService.updateById(userRecharge);
+            System.out.println("支付成功后的状态为"+b);
             // 余额变动
             userService.operationNowMoney(user.getUid(), payPrice, user.getNowMoney(), "add");
             // 创建记录

@@ -37,5 +37,8 @@ public class PreOrderRequest {
     @ApiModelProperty(value = "早早鸟状态")
     private Integer birdStatus;
 
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
+
 
 }

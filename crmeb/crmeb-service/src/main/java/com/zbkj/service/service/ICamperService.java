@@ -3,6 +3,8 @@ package com.zbkj.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zbkj.common.model.camper.Camper;
+import com.zbkj.common.page.CommonPage;
+import com.zbkj.common.request.PageParamRequest;
 
 import java.util.List;
 
@@ -38,4 +40,6 @@ public interface ICamperService extends IService<Camper> {
 
 
     public Camper getByCamperId(Integer addressId);
+
+    CommonPage<Camper> getAllCamperList(PageParamRequest pageParamRequest);
 }

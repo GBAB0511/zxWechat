@@ -3,13 +3,12 @@ package com.zbkj.front.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageInfo;
 import com.zbkj.common.constants.CategoryConstants;
 import com.zbkj.common.constants.Constants;
-import com.zbkj.common.constants.RedisConstatns;
 import com.zbkj.common.constants.SysConfigConstants;
 import com.zbkj.common.model.product.StoreProduct;
+
 import com.zbkj.common.model.product.StoreProductAttr;
 import com.zbkj.common.model.product.StoreProductAttrValue;
 import com.zbkj.common.model.record.UserVisitRecord;
@@ -28,12 +27,10 @@ import com.zbkj.front.service.ProductService;
 import com.zbkj.service.delete.ProductUtils;
 import com.zbkj.service.service.*;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -51,43 +48,43 @@ import java.util.*;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
+    @Resource
     private StoreProductService storeProductService;
 
-    @Autowired
+    @Resource
     private CategoryService categoryService;
 
-    @Autowired
+    @Resource
     private StoreProductReplyService storeProductReplyService;
 
-    @Autowired
+    @Resource
     private UserService userService;
 
-    @Autowired
+    @Resource
     private StoreProductRelationService storeProductRelationService;
 
-    @Autowired
+    @Resource
     private SystemConfigService systemConfigService;
 
-    @Autowired
+    @Resource
     private ProductUtils productUtils;
 
-    @Autowired
+    @Resource
     private RedisUtil redisUtil;
 
-    @Autowired
+    @Resource
     private StoreProductAttrService attrService;
 
-    @Autowired
+    @Resource
     private StoreProductAttrValueService storeProductAttrValueService;
 
-    @Autowired
+    @Resource
     private SystemUserLevelService systemUserLevelService;
 
-    @Autowired
+    @Resource
     private StoreCartService cartService;
 
-    @Autowired
+    @Resource
     private UserVisitRecordService userVisitRecordService;
 
     /**
@@ -200,62 +197,31 @@ public class ProductServiceImpl implements ProductService {
             skuMap.put(atr.getSuk(), atr);
         }
         productDetailResponse.setProductValue(skuMap);
-        // 设置商品价格和详情
-        if (storeProduct.getEarlyBirdEndTime() - System.currentTimeMillis() / 1000 > 0) {
-            storeProduct.setVipPrice(storeProduct.getPrice().subtract(storeProduct.getDiscountAmount()));
-            //查询早早鸟活动剩余时间
-                long diffInSeconds = storeProduct.getEarlyBirdEndTime() - System.currentTimeMillis() / 1000;
-                Long days = diffInSeconds / (24 * 60 * 60); // 将秒数转换为天数
-                productDetailResponse.setEarlyBirdOverTime(Integer.parseInt(days.toString()));
+       if (storeProduct.getEarlyBirdStartTime()!=null){
+           // 设置商品价格和详情
+           if (storeProduct.getEarlyBirdEndTime() - System.currentTimeMillis() / 1000 > 0) {
+               if (storeProduct.getDiscountAmount()==null){
+                   storeProduct.setDiscountAmount(BigDecimal.ZERO);
+               }else{
+                   storeProduct.setVipPrice(storeProduct.getPrice().subtract(storeProduct.getDiscountAmount()));
+               }
+               //查询早早鸟活动剩余时间
+               long diffInSeconds = storeProduct.getEarlyBirdEndTime() - System.currentTimeMillis() / 1000;
+               Long days = diffInSeconds / (24 * 60 * 60); // 将秒数转换为天数
+               productDetailResponse.setEarlyBirdOverTime(Integer.parseInt(days.toString()));
 
-        } else {
-            productDetailResponse.setEarlyBirdOverTime(0);
-            storeProduct.setVipPrice(storeProduct.getPrice());
-        }
-        // 当前时间戳
-        Long currentTimestamp = System.currentTimeMillis()/1000;
+           } else {
+               productDetailResponse.setEarlyBirdOverTime(0);
+               storeProduct.setVipPrice(storeProduct.getPrice());
+           }
+       }
 
-        // 格式化工具，将时间戳转为日期
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd");
-//        Integer startTime = storeProduct.getStartTime();
-//        Long startTimeTmp = Long.parseLong(startTime.toString());
-//
-//        Integer endTime = storeProduct.getEndTime() ;
-//        Long endTimeTmp = Long.parseLong(endTime.toString());
-
-
-        // 保存结果的列表
-//        List<Map<String, Object>> result = new ArrayList<>();
-//        while (startTimeTmp <= endTimeTmp) {
-//
-//            // 构建结果
-//            Map<String, Object> dateInfo = new HashMap<>();
-//
-//            // 判断是否大于当前时间戳
-////            boolean isAfterCurrentTime = startTimeTmp >= currentTimestamp;
-//            if (getZeroTimeStamp(startTimeTmp) < getZeroTimeStamp(currentTimestamp)){
-//                dateInfo.put("info", "已结束");
-//            }else if (getZeroTimeStamp(startTimeTmp) == getZeroTimeStamp(currentTimestamp)){
-//                dateInfo.put("info", "进行中");
-//            }else if(getZeroTimeStamp(startTimeTmp) > getZeroTimeStamp(currentTimestamp)){
-//                dateInfo.put("info", "即将开始");
-//            }
-//            dateInfo.put("date", dateFormat.format(startTimeTmp*1000L)); // 转换为日期格式
-//            // 添加到结果列表
-//            result.add(dateInfo);
-//
-//            // 时间戳加一天 (86400 秒 = 1 天)
-//
-//            startTimeTmp+= 86400L;
-//
-//        }
-//
-//        productDetailResponse.setOperationPeriod(result);
         productDetailResponse.setProductInfo(storeProduct);
 
         // 商品活动
         List<ProductActivityItemResponse> activityAllH5 = productUtils.getProductAllActivity(storeProduct);
         productDetailResponse.setActivityAllH5(activityAllH5);
+        productDetailResponse.setOperationPeriod(storeProduct.getOperationPeriod());
         // 更新商品浏览量
         storeProductService.updateById(new StoreProduct() {{
             setId(id);

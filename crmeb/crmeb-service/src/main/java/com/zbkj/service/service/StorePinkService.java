@@ -88,4 +88,6 @@ public interface StorePinkService extends IService<StorePink> {
      * @return Integer
      */
     Integer getTotalPeople();
+
+    StorePink getByProductId(Integer productId);
 }

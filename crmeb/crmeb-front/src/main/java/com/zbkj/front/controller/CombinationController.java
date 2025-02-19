@@ -77,7 +77,7 @@ public class CombinationController {
      * @param pinkId 拼团团长单id
      */
     @ApiOperation(value = "去拼团")
-    @RequestMapping(value = "/pink/{pinkId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/pink/{pinkId}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public CommonResult<GoPinkResponse> goPink(@PathVariable(value = "pinkId") Integer pinkId) {
         GoPinkResponse goPinkResponse = storeCombinationService.goPink(pinkId);
         return CommonResult.success(goPinkResponse);

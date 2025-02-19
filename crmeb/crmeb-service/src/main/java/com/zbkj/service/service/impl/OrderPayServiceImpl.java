@@ -199,7 +199,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         // 商品赠送积分
         // 查询订单详情
         // 获取商品额外赠送积分
-        List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getId().toString());
+        List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
         if (orderInfoList.get(0).getProductType().equals(0)) {
             List<Integer> productIds = orderInfoList.stream().map(StoreOrderInfo::getProductId).collect(Collectors.toList());
             if (productIds.size() > 0) {
@@ -285,7 +285,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                         SmsTemplate smsTemplate = smsTemplateService.getDetail(payAdminNotification.getSmsId());
                         // 发送短信
                         systemAdminList.forEach(admin -> {
-                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), Integer.valueOf(smsTemplate.getTempId()));
+//                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), Integer.valueOf(smsTemplate.getTempId()));
                         });
                     }
                 }
@@ -689,7 +689,6 @@ public class OrderPayServiceImpl implements OrderPayService {
                         break;
                 }
             }
-
             boolean changePayType = storeOrderService.updateById(storeOrder);
             if (!changePayType) {
                 throw new CrmebException("变更订单支付类型失败!");
@@ -732,12 +731,14 @@ public class OrderPayServiceImpl implements OrderPayService {
             }
             // 更新商户订单号
             storeOrder.setOutTradeNo(unifiedorder.get("outTradeNo"));
+
             storeOrderService.updateById(storeOrder);
             response.setJsConfig(vo);
             return response;
         }
         // 余额支付
         if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
+
             Boolean yueBoolean = yuePay(storeOrder);
             response.setStatus(yueBoolean);
             return response;

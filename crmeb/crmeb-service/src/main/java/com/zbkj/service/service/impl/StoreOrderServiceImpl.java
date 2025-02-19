@@ -860,20 +860,30 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         return systemConfigService.getDeliveryInfo();
     }
 
-    /**
-     * 更新支付结果
-     * @param orderNo 订单编号
-     * @return Boolean
-     */
     @Override
     public Boolean updatePaid(String orderNo) {
+
+        // 输出当前订单状态
+        StoreOrder storeOrder = getByOderId(orderNo);
+        System.out.println("当前订单状态: {}"+ storeOrder.getPaid());
+
+        // 使用 LambdaUpdateWrapper 来构建更新条件
         LambdaUpdateWrapper<StoreOrder> lqw = new LambdaUpdateWrapper<>();
-        lqw.set(StoreOrder::getPaid, true);
-        lqw.set(StoreOrder::getPayTime, DateUtil.nowDateTime());
-        lqw.eq(StoreOrder::getOrderId, orderNo);
-        lqw.eq(StoreOrder::getPaid,false);
-        return update(lqw);
+        lqw.set(StoreOrder::getPaid, true); // 设置订单为已支付
+        lqw.set(StoreOrder::getPayTime, DateUtil.nowDateTime()); // 设置支付时间
+        lqw.eq(StoreOrder::getOrderId, orderNo); // 根据订单号查找
+//        lqw.eq(StoreOrder::getPaid, false); // 确保订单还未支付才进行更新
+
+        // 执行更新操作
+        boolean isUpdated = update(lqw);
+
+        // 输出当前订单状态
+        StoreOrder storeOrder1 = getByOderId(orderNo);
+        System.out.println("当前订单状态: {}"+ storeOrder1.getPaid());
+
+        return isUpdated;
     }
+
 
     /**
      * 跟据订单号列表获取订单列表Map
@@ -983,7 +993,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             if (StrUtil.isNotBlank(user.getPhone())) {
                 SmsTemplate smsTemplate = smsTemplateService.getDetail(notification.getSmsId());
                 // 发送改价短信提醒
-                smsService.sendOrderEditPriceNotice(user.getPhone(), existOrder.getOrderId(), request.getPayPrice(), Integer.valueOf(smsTemplate.getTempId()));
+//                smsService.sendOrderEditPriceNotice(user.getPhone(), existOrder.getOrderId(), request.getPayPrice(), Integer.valueOf(smsTemplate.getTempId()));
             }
         }
 
@@ -1491,7 +1501,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 if (voList.size() > 1) {
                     proName = proName.concat("等");
                 }
-                smsService.sendOrderDeliverNotice(user.getPhone(), user.getNickname(), proName, storeOrder.getOrderId(), Integer.valueOf(smsTemplate.getTempId()));
+//                smsService.sendOrderDeliverNotice(user.getPhone(), user.getNickname(), proName, storeOrder.getOrderId(), Integer.valueOf(smsTemplate.getTempId()));
             }
         }
 

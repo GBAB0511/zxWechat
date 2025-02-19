@@ -82,7 +82,7 @@ public class StoreOrderController {
     @ApiOperation(value = "订单列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiImplicitParams ({
-        @ApiImplicitParam(name = "type", value = "评价等级|0=未支付,1=待发货,2=待收货,3=待评价,4=已完成,-3=售后/退款", required = true)
+        @ApiImplicitParam(name = "type", value = "评价等级|0=代付款,1=待使用,2=待确认,3=待评价,4=已完成,-3=售后/退款", required = true)
     })
     public CommonResult<CommonPage<OrderDetailResponse>> orderList(@RequestParam(name = "type") Integer type,
                                                                    @ModelAttribute PageParamRequest pageRequest) {

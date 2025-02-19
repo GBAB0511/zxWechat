@@ -211,4 +211,7 @@ public class StoreProductInfoResponse implements Serializable {
     @ApiModelProperty(value = "安全保障")
     @NotBlank(message = "安全保障不能为空")
     private String securityGuarantee;
+
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
 }

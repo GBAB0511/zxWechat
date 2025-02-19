@@ -83,4 +83,7 @@ public class StoreOrderInfo implements Serializable {
 
     @ApiModelProperty(value = "商品类型:0-普通，1-秒杀，2-砍价，3-拼团，4-视频号")
     private Integer productType;
+
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
 }

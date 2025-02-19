@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+
 /**
  * 程序主入口
  */
@@ -20,10 +21,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class) //去掉数据源
 @ComponentScan(basePackages = {"com.zbkj"})
 @MapperScan(basePackages = {"com.zbkj.**.dao"})
-public class CrmebAdminApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(CrmebAdminApplication.class, args);
-    }
+public class CrmebAdminApplication { public static void main(String[] args) {SpringApplication.run(CrmebAdminApplication.class, args);}
 
 }

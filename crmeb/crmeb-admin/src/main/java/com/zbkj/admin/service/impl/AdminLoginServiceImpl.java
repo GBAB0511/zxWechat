@@ -73,6 +73,8 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     public SystemLoginResponse login(SystemAdminLoginRequest systemAdminLoginRequest, String ip) {
         // 判断验证码
         boolean codeCheckResult = validateCodeService.check(systemAdminLoginRequest.getKey(), systemAdminLoginRequest.getCode());
+        System.out.println("验证码：" + systemAdminLoginRequest.getKey());
+        System.out.println("验证码：1"+systemAdminLoginRequest.getCode());
         if (!codeCheckResult) throw new CrmebException("验证码不正确");
         // 用户验证
         Authentication authentication;

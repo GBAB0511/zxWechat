@@ -243,7 +243,10 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         BeanUtils.copyProperties(request, storeProduct);
         storeProduct.setId(null);
         storeProduct.setAddTime(DateUtil.getNowTime());
-        storeProduct.setIsShow(false);
+        storeProduct.setIsShow(true);
+        storeProduct.setStartTime(DateUtil.getSecondTimestamp(request.getStartTime()));
+        storeProduct.setEndTime(DateUtil.getSecondTimestamp(request.getEndTime()));
+        storeProduct.setOperationPeriod(request.getOperationPeriod());
 
         // 设置Acticity活动
         storeProduct.setActivity(getProductActivityStr(request.getActivity()));
@@ -273,13 +276,13 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
 
         // 默认值设置
         if (ObjectUtil.isNull(request.getSort())) {
-            storeProduct.setSort(0);
+            storeProduct.setSort(1);
         }
         if (ObjectUtil.isNull(request.getIsHot())) {
             storeProduct.setIsHot(false);
         }
         if (ObjectUtil.isNull(request.getIsBenefit())) {
-            storeProduct.setIsBenefit(false);
+            storeProduct.setIsBenefit(true);
         }
         if (ObjectUtil.isNull(request.getIsBest())) {
             storeProduct.setIsBest(false);
@@ -443,6 +446,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         storeProduct.setStartTime(secondTimestamp2);
         Integer secondTimestamp3 = DateUtil.getSecondTimestamp(storeProductRequest.getEndTime());
         storeProduct.setEndTime(secondTimestamp3);
+        storeProduct.setStock(storeProductRequest.getStock());
 
         // 设置Activity活动
         storeProduct.setActivity(getProductActivityStr(storeProductRequest.getActivity()));
@@ -464,6 +468,8 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         storeProduct.setPrice(minAttrValue.getPrice());
         storeProduct.setOtPrice(minAttrValue.getOtPrice());
         storeProduct.setCost(minAttrValue.getCost());
+        //设置营期
+        storeProduct.setOperationPeriod(storeProductRequest.getOperationPeriod());
 
         // attr部分
         List<StoreProductAttrAddRequest> addRequestList = storeProductRequest.getAttr();
@@ -662,10 +668,14 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         }
 
         StoreProductInfoResponse storeProductResponse = new StoreProductInfoResponse();
-        Date date = DateUtil.timeStamp10ToDate(storeProduct.getEarlyBirdStartTime());
-        System.out.println(date+"早早鸟开始时间date");
-        storeProductResponse.setEarlyBirdStartTime(date);
-        storeProductResponse.setEarlyBirdEndTime(DateUtil.timeStamp10ToDate(storeProduct.getEarlyBirdEndTime()));
+        if (storeProduct.getEarlyBirdStartTime()!=null) {
+            Date date = DateUtil.timeStamp10ToDate(storeProduct.getEarlyBirdStartTime());
+            storeProductResponse.setEarlyBirdStartTime(date);
+            storeProductResponse.setEarlyBirdEndTime(DateUtil.timeStamp10ToDate(storeProduct.getEarlyBirdEndTime()));
+        }else {
+            storeProductResponse.setEarlyBirdStartTime(null);
+            storeProductResponse.setEarlyBirdEndTime(null);
+        }
         storeProductResponse.setStartTime(DateUtil.timeStamp10ToDate(storeProduct.getStartTime()));
         storeProductResponse.setEndTime(DateUtil.timeStamp10ToDate(storeProduct.getEndTime()));
         BeanUtils.copyProperties(storeProduct, storeProductResponse);
@@ -739,11 +749,11 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     @Override
     public List<StoreProductTabsHeader> getTabsHeader() {
         List<StoreProductTabsHeader> headers = new ArrayList<>();
-        StoreProductTabsHeader header1 = new StoreProductTabsHeader(0,"出售中商品",1);
-        StoreProductTabsHeader header2 = new StoreProductTabsHeader(0,"仓库中商品",2);
-        StoreProductTabsHeader header3 = new StoreProductTabsHeader(0,"已经售馨商品",3);
-        StoreProductTabsHeader header4 = new StoreProductTabsHeader(0,"警戒库存",4);
-        StoreProductTabsHeader header5 = new StoreProductTabsHeader(0,"商品回收站",5);
+        StoreProductTabsHeader header1 = new StoreProductTabsHeader(0,"上架中",1);
+        StoreProductTabsHeader header2 = new StoreProductTabsHeader(0,"全部",2);
+        StoreProductTabsHeader header3 = new StoreProductTabsHeader(0,"已经售馨",3);
+        StoreProductTabsHeader header4 = new StoreProductTabsHeader(0,"警戒名额",4);
+        StoreProductTabsHeader header5 = new StoreProductTabsHeader(0,"回收站",5);
         headers.add(header1);
         headers.add(header2);
         headers.add(header3);
@@ -1317,7 +1327,8 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 StoreProduct::getCourseContent,
                 StoreProduct::getTransportation,
                 StoreProduct::getCostDescription,
-                StoreProduct::getSecurityGuarantee);
+                StoreProduct::getSecurityGuarantee,
+                StoreProduct::getOperationPeriod);
         lqw.eq(StoreProduct::getId, id);
         lqw.eq(StoreProduct::getIsRecycle, false);
         lqw.eq(StoreProduct::getIsDel, false);

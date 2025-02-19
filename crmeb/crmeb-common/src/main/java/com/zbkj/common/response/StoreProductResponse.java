@@ -289,4 +289,7 @@ public class StoreProductResponse implements Serializable {
 
     @ApiModelProperty(value = "早早鸟剩余时间")
     private Long lastTime;
+
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
 }

@@ -368,4 +368,7 @@ public class StoreOrderDetailInfoResponse implements Serializable {
 //    private SystemStore systemStore;
 //    private String mapKey;
 //    private String statusPic;
+
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
 }

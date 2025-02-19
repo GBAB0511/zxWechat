@@ -3,7 +3,11 @@ package com.zbkj.service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.zbkj.common.model.camper.Camper;
+import com.zbkj.common.model.order.StoreOrder;
+import com.zbkj.common.page.CommonPage;
+import com.zbkj.common.request.PageParamRequest;
 import com.zbkj.service.dao.CamperMapper;
 import com.zbkj.service.service.ICamperService;
 import org.springframework.stereotype.Service;
@@ -46,6 +50,21 @@ public class CamperServiceImpl extends ServiceImpl<CamperMapper, Camper> impleme
                 .eq(userId != null, Camper::getUserId, userId));
     }
 
+
+    @Override
+    public CommonPage<Camper> getAllCamperList(PageParamRequest pageParamRequest ) {
+        // 开启分页
+        PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+
+        // 创建查询条件构造器
+        LambdaQueryWrapper<Camper> lqw = new LambdaQueryWrapper<>();
+
+        // 查询列表
+        List<Camper> camperList = camperMapper.selectList(lqw);
+
+        // 使用分页工具封装返回结果
+        return CommonPage.restPage(camperList);
+    }
 
     @Override
     public Camper getByCamperId(Integer addressId) {

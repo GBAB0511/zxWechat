@@ -13,6 +13,7 @@ import com.zbkj.common.model.bargain.StoreBargainUser;
 import com.zbkj.common.model.camper.Camper;
 import com.zbkj.common.model.cat.StoreCart;
 import com.zbkj.common.model.combination.StoreCombination;
+import com.zbkj.common.model.combination.StorePink;
 import com.zbkj.common.model.coupon.StoreCouponUser;
 import com.zbkj.common.model.express.Express;
 import com.zbkj.common.model.express.ShippingTemplates;
@@ -121,7 +122,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private StoreSeckillService storeSeckillService;
 
+    @Resource
     private StoreCombinationService storeCombinationService;
+
+    @Resource
+    private StorePinkService storePinkService;
 
 
     @Autowired
@@ -202,9 +207,9 @@ public class OrderServiceImpl implements OrderService {
             return ;
         }
         // 发送短信
-        SmsTemplate smsTemplate = smsTemplateService.getDetail(notification.getSmsId());
-        Integer tempId = Integer.valueOf(smsTemplate.getTempId());
-        systemAdminList.forEach(admin -> smsService.sendCreateOrderNotice(admin.getPhone(), orderNo, admin.getRealName(), tempId));
+//        SmsTemplate smsTemplate = smsTemplateService.getDetail(notification.getSmsId());
+//        Integer tempId = Integer.valueOf(smsTemplate.getTempId());
+//        systemAdminList.forEach(admin -> smsService.sendCreateOrderNotice(admin.getPhone(), orderNo, admin.getRealName(), tempId));
     }
 
     /**
@@ -488,10 +493,10 @@ public class OrderServiceImpl implements OrderService {
             return "退款中";
         }
         if (storeOrder.getStatus().equals(0)) {
-            return "待发货";
+            return "待使用";
         }
         if (storeOrder.getStatus().equals(1)) {
-            return "待收货";
+            return "待确认";
         }
         if (storeOrder.getStatus().equals(2)) {
             return "待评价";
@@ -536,6 +541,21 @@ public class OrderServiceImpl implements OrderService {
             orderInfoResponse.setAttrId(e.getAttrValueId());
             orderInfoResponse.setSku(e.getSku());
             orderInfoResponse.setUnique(e.getUnique());
+            orderInfoResponse.setOperationPeriod(e.getOperationPeriod());
+
+
+            // 如果该商品是拼团商品，则查找对应的拼团记录并设置pinkId
+            if (e.getProductType() == 3) { // 如果该商品是拼团商品
+                StoreCombination storeCombination = storeCombinationService.getById(e.getProductId());
+                if (ObjectUtil.isNotNull(storeCombination)) {
+                    // 查找该商品在拼团表中的拼团记录
+                    StorePink storePink = storePinkService.getByProductId(e.getProductId());
+                    if (ObjectUtil.isNotNull(storePink)) {
+                        // 如果找到拼团记录，则设置拼团ID
+                        orderInfoResponse.setPinkId(storePink.getId());  // 设置拼团ID
+                    }
+                }
+            }
             infoResponseList.add(orderInfoResponse);
         });
         storeOrderDetailResponse.setOrderInfoList(infoResponseList);
@@ -589,7 +609,7 @@ public class OrderServiceImpl implements OrderService {
             record.set("msg", "正在为您退款,感谢您的支持");
         } else if (storeOrder.getStatus() == 0) {
             record.set("type", 1);
-            record.set("title", "未发货");
+            record.set("title", "待使用");
             record.set("msg", "商家未发货,请耐心等待");
         } else if (storeOrder.getStatus() == 1) { // 待收货处理
             // 待收货
@@ -600,7 +620,7 @@ public class OrderServiceImpl implements OrderService {
                 List<StoreOrderStatus> sOrderStatusResults = storeOrderStatusService.getByEntity(storeOrderStatus);
                 if (sOrderStatusResults.size()>0) {
                     record.set("type", 2);
-                    record.set("title", "待收货");
+                    record.set("title", "待确认");
                     record.set("msg", "商家已送货,请耐心等待");
                 }
             } else if (null != storeOrder.getDeliveryType() && storeOrder.getDeliveryType().equals(Constants.ORDER_LOG_EXPRESS)) {
@@ -610,7 +630,7 @@ public class OrderServiceImpl implements OrderService {
                 List<StoreOrderStatus> sOrderStatusResults = storeOrderStatusService.getByEntity(storeOrderStatus);
                 if (sOrderStatusResults.size()>0) {
                     record.set("type", 2);
-                    record.set("title", "待收货");
+                    record.set("title", "待确认");
                     record.set("msg", "商家已发货,请耐心等待");
                 }
             }else {
@@ -620,11 +640,11 @@ public class OrderServiceImpl implements OrderService {
                 List<StoreOrderStatus> sOrderStatusResults = storeOrderStatusService.getByEntity(storeOrderStatus);
                 if (sOrderStatusResults.size()>0) {
                     record.set("type", 2);
-                    record.set("title", "待收货");
+                    record.set("title", "待确认");
                     record.set("msg", "服务商已虚拟发货");
                 } else {
                     record.set("type", 2);
-                    record.set("title", "待收货");
+                    record.set("title", "待确认");
                     record.set("msg", "退款拒绝订单已发货");
                 }
             }
@@ -854,6 +874,7 @@ public class OrderServiceImpl implements OrderService {
         orderInfoVo.setPayFee(orderInfoVo.getProTotalFee());
         orderInfoVo.setUserIntegral(user.getIntegral());
         orderInfoVo.setUserBalance(user.getNowMoney());
+        orderInfoVo.setOperationPeriod(request.getOperationPeriod());
         // 缓存订单
         String key = user.getUid() + DateUtil.getNowTime().toString()+CrmebUtil.getUuid();
         redisUtil.set("user_order:" + key, JSONObject.toJSONString(orderInfoVo), Constants.ORDER_CASH_CONFIRM, TimeUnit.MINUTES);
@@ -1016,9 +1037,11 @@ public class OrderServiceImpl implements OrderService {
             soInfo.setUnique(UUID.randomUUID().toString());
             soInfo.setOrderNo(orderNo);
             soInfo.setProductName(detailVo.getProductName());
-//            soInfo.setAttrValueId(detailVo.getAttrValueId());
+            //添加营期
+            soInfo.setOperationPeriod(detailVo.getOperationPeriod());
+            soInfo.setAttrValueId(detailVo.getAttrValueId());
             soInfo.setImage(detailVo.getImage());
-//            soInfo.setSku(detailVo.getSku());
+            soInfo.setSku(detailVo.getSku());
             soInfo.setPrice(detailVo.getPrice());
             soInfo.setPayNum(detailVo.getPayNum());
 //            soInfo.setWeight(detailVo.getWeight());
@@ -1029,7 +1052,7 @@ public class OrderServiceImpl implements OrderService {
                 soInfo.setGiveIntegral(0);
             }
             soInfo.setIsReply(false);
-//            soInfo.setIsSub(detailVo.getIsSub());
+            soInfo.setIsSub(detailVo.getIsSub());
             soInfo.setProductType(detailVo.getProductType());
             if (ObjectUtil.isNotNull(detailVo.getVipPrice())) {
                 soInfo.setVipPrice(detailVo.getVipPrice());
@@ -1121,6 +1144,7 @@ public class OrderServiceImpl implements OrderService {
         storeOrder.setPaid(false);
         storeOrder.setCost(BigDecimal.ZERO);
         storeOrder.setType(0);
+        storeOrder.setOperationPeriod(orderInfoVo.getOperationPeriod());
         if (orderInfoVo.getIsVideo()) {
             storeOrder.setType(1);// 视频号订单
         }
@@ -1206,7 +1230,7 @@ public class OrderServiceImpl implements OrderService {
         redisUtil.lPush(Constants.ORDER_AUTO_CANCEL_KEY, storeOrder.getOrderId());
 
         // 发送后台管理员下单提醒通知短信
-        sendAdminOrderNotice(storeOrder.getOrderId());
+//        sendAdminOrderNotice(storeOrder.getOrderId());
 
         MyRecord record = new MyRecord();
         record.set("orderNo", storeOrder.getOrderId());

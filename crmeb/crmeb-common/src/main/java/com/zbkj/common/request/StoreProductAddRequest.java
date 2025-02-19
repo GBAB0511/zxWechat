@@ -89,14 +89,12 @@ public class StoreProductAddRequest implements Serializable {
     private Integer giveIntegral;
 
     @ApiModelProperty(value = "是否单独分佣", required = true)
-    @NotNull(message = "是否单独分佣不能为空")
     private Boolean isSub;
 
     @ApiModelProperty(value = "虚拟销量")
     private Integer ficti;
 
     @ApiModelProperty(value = "运费模板ID", required = true)
-    @NotNull(message = "运费模板不能为空")
     private Integer tempId;
 
     @ApiModelProperty(value = "规格 0单 1多", required = true)
@@ -181,4 +179,7 @@ public class StoreProductAddRequest implements Serializable {
     @ApiModelProperty(value = "安全保障")
     @NotBlank(message = "安全保障不能为空")
     private String securityGuarantee;
+
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
 }

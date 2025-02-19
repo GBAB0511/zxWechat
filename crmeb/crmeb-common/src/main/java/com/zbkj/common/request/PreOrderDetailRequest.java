@@ -54,4 +54,7 @@ public class PreOrderDetailRequest {
     @ApiModelProperty(value = "秒杀商品id")
     private Integer seckillId = 0;
 
+    @ApiModelProperty(value = "营期")
+    private String operationPeriod;
+
 }

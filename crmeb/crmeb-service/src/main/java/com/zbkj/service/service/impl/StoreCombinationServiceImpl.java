@@ -761,11 +761,9 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
             detailResponse.setSpecType(true);
         }
         // 单属性时讲attrValueId 赋值给外层方便前端使用
-        if (!detailResponse.getSpecType()) {
-            detailResponse.setAloneAttrValueId(attrList.get(0).getId());
-        }
-
-
+//        if (!detailResponse.getSpecType()) {
+//            detailResponse.setAloneAttrValueId(attrList.get(0).getId());
+//        }
         StoreProductAttrValue spavValue = new StoreProductAttrValue();
         spavValue.setProductId(storeCombination.getId());
         spavValue.setType(Constants.PRODUCT_TYPE_PINGTUAN);

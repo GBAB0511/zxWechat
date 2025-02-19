@@ -160,6 +160,12 @@ public class WeChatPayServiceImpl implements WeChatPayService {
             wechatPayInfo.setTradeStateDesc(record.getStr("trade_state_desc"));
 
             Boolean updatePaid = transactionTemplate.execute(e -> {
+//                storeOrderService.updatePaid(orderNo);
+//                wechatPayInfoService.updateById(wechatPayInfo);
+//                if (storeOrder.getUseIntegral() > 0) {
+//                    userService.updateIntegral(user, storeOrder.getUseIntegral(), "sub");
+//                }
+            try {
                 storeOrderService.updatePaid(orderNo);
                 wechatPayInfoService.updateById(wechatPayInfo);
                 if (storeOrder.getUseIntegral() > 0) {
@@ -204,7 +210,7 @@ public class WeChatPayServiceImpl implements WeChatPayService {
                         storePink.setStopTime(headPink.getStopTime());
                     } else {
                         DateTime hourTime = cn.hutool.core.date.DateUtil.offsetHour(dateTime, effectiveTime);
-                        long stopTime =  hourTime.getTime();
+                        long stopTime = hourTime.getTime();
                         if (stopTime > storeCombination.getStopTime()) {
                             stopTime = storeCombination.getStopTime();
                         }
@@ -217,10 +223,18 @@ public class WeChatPayServiceImpl implements WeChatPayService {
                     storePinkService.save(storePink);
                     // 如果是开团，需要更新订单数据
                     storeOrder.setPinkId(storePink.getId());
+
                     storeOrderService.updateById(storeOrder);
                 }
+            }catch (Exception ex) {
+                // 这里不会回滚事务
+                System.out.println("异常处理，但不会回滚事务: " + ex.getMessage());
+            }
                 return Boolean.TRUE;
+
+
             });
+            System.out.println("updatePaid的修改状态为:" + updatePaid);
             if (!updatePaid) {
                 throw new CrmebException("支付成功更新订单失败");
             }

@@ -26,6 +26,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -143,29 +144,30 @@ public class IndexServiceImpl implements IndexService {
         List<IndexProductResponse> productResponseArrayList = new ArrayList<>();
         for (StoreProduct storeProduct : storeProductList) {
             IndexProductResponse productResponse = new IndexProductResponse();
-//            Long timeDiffMillis = storeProduct.getEndTime() - com.zbkj.common.utils.DateUtil.getTime();
-
-//            // 将毫秒转换为天
-//            Long timeDiffDays = timeDiffMillis / (1000 * 60 * 60 * 24);
-//            productResponse.setRemainingTime(Integer.parseInt(timeDiffDays.toString()));
             // 获取当前时间的毫秒级时间戳
             Long currentTimeMillis = System.currentTimeMillis() / 1000;  // 转为秒
-
             // 计算时间差（秒）
             Long timeDiffSeconds = storeProduct.getEndTime() - currentTimeMillis;
-
             // 将秒数转换为毫秒
             Long timeDiffMillis = timeDiffSeconds * 1000;
-
             // 将毫秒转换为天数
             Long timeDiffDays = timeDiffMillis / (1000 * 60 * 60 * 24);
-
-            productResponse.setRemainingTime(Integer.parseInt(timeDiffDays.toString()));
-            System.out.println("剩余天数: " + timeDiffDays);
+            if (timeDiffDays < 0) {
+                productResponse.setRemainingTime(0);
+                System.out.println("剩余天数: " + timeDiffDays);
+            }else{
+                productResponse.setRemainingTime(Integer.parseInt(timeDiffDays.toString()));
+                System.out.println("剩余天数: " + timeDiffDays);
+            }
 
             //如果早早鸟状态为true 则设置商品早早鸟价格
-            if (storeProduct.getIsSeckill()!=null && storeProduct.getIsSeckill()==true ){
-                storeProduct.setVipPrice(storeProduct.getPrice().subtract(storeProduct.getDiscountAmount()));
+            boolean b = storeProduct.getEarlyBirdEndTime() < currentTimeMillis;
+            if (b ){
+                // 确保价格和优惠金额不为空并且为非负值
+                BigDecimal price = storeProduct.getPrice() == null ? BigDecimal.ZERO : storeProduct.getPrice().max(BigDecimal.ZERO);
+                BigDecimal discountAmount = storeProduct.getDiscountAmount() == null ? BigDecimal.ZERO : storeProduct.getDiscountAmount().max(BigDecimal.ZERO);// 计算 VIP 价格，并确保最终价格为非负
+                BigDecimal vipPrice = price.subtract(discountAmount);
+                storeProduct.setVipPrice(vipPrice.max(BigDecimal.ZERO));
             }else{
                 storeProduct.setVipPrice(storeProduct.getPrice());
             }
@@ -174,7 +176,12 @@ public class IndexServiceImpl implements IndexService {
             // 活动类型默认：直接跳过
             if (activityList.get(0).equals(Constants.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
-                productResponseArrayList.add(productResponse);
+                if (productResponse.getRemainingTime()>=0){
+                    productResponseArrayList.add(productResponse);
+                }else{
+                    storeProductService.offShelf(storeProduct.getId());
+                }
+
                 continue;
             }
             // 根据参与活动添加对应商品活动标示
@@ -209,8 +216,6 @@ public class IndexServiceImpl implements IndexService {
                 }
             }
             BeanUtils.copyProperties(storeProduct, productResponse);
-
-            productResponseArrayList.add(productResponse);
         }
         CommonPage<IndexProductResponse> productResponseCommonPage = CommonPage.restPage(productResponseArrayList);
         BeanUtils.copyProperties(storeProductCommonPage, productResponseCommonPage, "list");
