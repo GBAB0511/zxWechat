@@ -124,12 +124,6 @@ public class IndexServiceImpl implements IndexService {
         return map;
     }
 
-    /**
-     * 获取首页商品列表
-     * @param type 类型 【1 精品推荐 2 热门榜单 3首发新品 4促销单品】
-     * @param pageParamRequest 分页参数
-     * @return List
-     */
     @Override
     public CommonPage<IndexProductResponse> findIndexProductList(Integer type, PageParamRequest pageParamRequest) {
         if (type < Constants.INDEX_RECOMMEND_BANNER || type > Constants.INDEX_BENEFIT_BANNER) {
@@ -155,20 +149,21 @@ public class IndexServiceImpl implements IndexService {
             if (timeDiffDays < 0) {
                 productResponse.setRemainingTime(0);
                 System.out.println("剩余天数: " + timeDiffDays);
-            }else{
-                productResponse.setRemainingTime(Integer.parseInt(timeDiffDays.toString()));
+            } else {
+                productResponse.setRemainingTime(timeDiffDays.intValue());
                 System.out.println("剩余天数: " + timeDiffDays);
             }
 
-            //如果早早鸟状态为true 则设置商品早早鸟价格
-            boolean b = storeProduct.getEarlyBirdEndTime() < currentTimeMillis;
-            if (b ){
-                // 确保价格和优惠金额不为空并且为非负值
+            // 获取早早鸟结束时间，并进行空值检查
+            Integer earlyBirdEndTime = storeProduct.getEarlyBirdEndTime();
+            if (earlyBirdEndTime != null && earlyBirdEndTime < currentTimeMillis) {
+                // 如果早早鸟结束时间已过，设置VIP价格
                 BigDecimal price = storeProduct.getPrice() == null ? BigDecimal.ZERO : storeProduct.getPrice().max(BigDecimal.ZERO);
-                BigDecimal discountAmount = storeProduct.getDiscountAmount() == null ? BigDecimal.ZERO : storeProduct.getDiscountAmount().max(BigDecimal.ZERO);// 计算 VIP 价格，并确保最终价格为非负
+                BigDecimal discountAmount = storeProduct.getDiscountAmount() == null ? BigDecimal.ZERO : storeProduct.getDiscountAmount().max(BigDecimal.ZERO);
                 BigDecimal vipPrice = price.subtract(discountAmount);
                 storeProduct.setVipPrice(vipPrice.max(BigDecimal.ZERO));
-            }else{
+            } else {
+                // 如果没有早早鸟结束时间或者还未结束，使用原价
                 storeProduct.setVipPrice(storeProduct.getPrice());
             }
 
@@ -176,12 +171,11 @@ public class IndexServiceImpl implements IndexService {
             // 活动类型默认：直接跳过
             if (activityList.get(0).equals(Constants.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
-                if (productResponse.getRemainingTime()>=0){
+                if (productResponse.getRemainingTime() >= 0) {
                     productResponseArrayList.add(productResponse);
-                }else{
+                } else {
                     storeProductService.offShelf(storeProduct.getId());
                 }
-
                 continue;
             }
             // 根据参与活动添加对应商品活动标示

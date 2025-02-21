@@ -549,7 +549,7 @@ public class OrderServiceImpl implements OrderService {
                 StoreCombination storeCombination = storeCombinationService.getById(e.getProductId());
                 if (ObjectUtil.isNotNull(storeCombination)) {
                     // 查找该商品在拼团表中的拼团记录
-                    StorePink storePink = storePinkService.getByProductId(e.getProductId());
+                    StorePink storePink = storePinkService.getByProductId(e.getId());
                     if (ObjectUtil.isNotNull(storePink)) {
                         // 如果找到拼团记录，则设置拼团ID
                         orderInfoResponse.setPinkId(storePink.getId());  // 设置拼团ID

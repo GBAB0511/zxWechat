@@ -872,7 +872,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         lqw.set(StoreOrder::getPaid, true); // 设置订单为已支付
         lqw.set(StoreOrder::getPayTime, DateUtil.nowDateTime()); // 设置支付时间
         lqw.eq(StoreOrder::getOrderId, orderNo); // 根据订单号查找
-//        lqw.eq(StoreOrder::getPaid, false); // 确保订单还未支付才进行更新
+        lqw.eq(StoreOrder::getPaid, false); // 确保订单还未支付才进行更新
 
         // 执行更新操作
         boolean isUpdated = update(lqw);

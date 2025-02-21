@@ -223,7 +223,7 @@ public class WeChatPayServiceImpl implements WeChatPayService {
                     storePinkService.save(storePink);
                     // 如果是开团，需要更新订单数据
                     storeOrder.setPinkId(storePink.getId());
-
+                    storeOrder.setPaid(true);
                     storeOrderService.updateById(storeOrder);
                 }
             }catch (Exception ex) {

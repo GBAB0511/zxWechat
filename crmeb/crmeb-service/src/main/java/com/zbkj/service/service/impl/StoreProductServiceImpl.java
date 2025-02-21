@@ -565,94 +565,120 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     @Override
     public StoreProductResponse getByProductId(Integer id) {
         StoreProduct storeProduct = dao.selectById(id);
-        if (null == storeProduct) throw new CrmebException("未找到对应商品信息");
+        if (null == storeProduct) {
+            throw new CrmebException("未找到对应商品信息");
+        }
+
         StoreProductResponse storeProductResponse = new StoreProductResponse();
-        storeProductResponse.setEarlyBirdStartTime(new Date(storeProduct.getEarlyBirdStartTime()*1000));
-        storeProductResponse.setEarlyBirdEndTime(new Date(storeProduct.getEarlyBirdEndTime()*1000));
+
+        // 安全获取早早鸟时间
+        if (storeProduct.getEarlyBirdStartTime() != null) {
+            storeProductResponse.setEarlyBirdStartTime(new Date(storeProduct.getEarlyBirdStartTime() * 1000));
+        }
+        if (storeProduct.getEarlyBirdEndTime() != null) {
+            storeProductResponse.setEarlyBirdEndTime(new Date(storeProduct.getEarlyBirdEndTime() * 1000));
+        }
+
+        // 使用 BeanUtils 复制属性
         BeanUtils.copyProperties(storeProduct, storeProductResponse);
+
+        // 设置商品属性
         StoreProductAttr spaPram = new StoreProductAttr();
         spaPram.setProductId(storeProduct.getId()).setType(Constants.PRODUCT_TYPE_NORMAL);
         storeProductResponse.setAttr(attrService.getByEntity(spaPram));
 
         // 设置商品所参与的活动
         storeProductResponse.setActivityH5(productUtils.getProductCurrentActivity(storeProduct));
+
+        // 获取商品属性值
         StoreProductAttrValue spavPram = new StoreProductAttrValue();
         spavPram.setProductId(id).setType(Constants.PRODUCT_TYPE_NORMAL);
         List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getByEntity(spavPram);
-        // 根据attrValue生成前端所需的数据
         List<HashMap<String, Object>> attrValues = new ArrayList<>();
 
+        // 后端多属性用于编辑
         if (storeProduct.getSpecType()) {
-            // 后端多属性用于编辑
             StoreProductAttrResult sparPram = new StoreProductAttrResult();
             sparPram.setProductId(storeProduct.getId()).setType(Constants.PRODUCT_TYPE_NORMAL);
             List<StoreProductAttrResult> attrResults = storeProductAttrResultService.getByEntity(sparPram);
-            if (null == attrResults || attrResults.size() == 0) {
+
+            if (attrResults == null || attrResults.isEmpty()) {
                 throw new CrmebException("未找到对应属性值");
             }
+
             StoreProductAttrResult attrResult = attrResults.get(0);
-            //PC 端生成skuAttrInfo
             List<StoreProductAttrValueRequest> storeProductAttrValueRequests =
                     com.alibaba.fastjson.JSONObject.parseArray(attrResult.getResult(), StoreProductAttrValueRequest.class);
-            if (null != storeProductAttrValueRequests) {
+
+            if (storeProductAttrValueRequests != null) {
                 for (int i = 0; i < storeProductAttrValueRequests.size(); i++) {
-//                    StoreProductAttrValueRequest storeProductAttrValueRequest = storeProductAttrValueRequests.get(i);
                     HashMap<String, Object> attrValue = new HashMap<>();
                     String currentSku = storeProductAttrValues.get(i).getSuk();
-                    List<StoreProductAttrValue> hasCurrentSku =
-                            storeProductAttrValues.stream().filter(e -> e.getSuk().equals(currentSku)).collect(Collectors.toList());
-                    StoreProductAttrValue currentAttrValue = hasCurrentSku.get(0);
-                    attrValue.put("id", hasCurrentSku.size() > 0 ? hasCurrentSku.get(0).getId():0);
-                    attrValue.put("image", currentAttrValue.getImage());
-                    attrValue.put("cost", currentAttrValue.getCost());
-                    attrValue.put("price", currentAttrValue.getPrice());
-                    attrValue.put("otPrice", currentAttrValue.getOtPrice());
-                    attrValue.put("stock", currentAttrValue.getStock());
-                    attrValue.put("barCode", currentAttrValue.getBarCode());
-                    attrValue.put("weight", currentAttrValue.getWeight());
-                    attrValue.put("volume", currentAttrValue.getVolume());
-                    attrValue.put("suk", currentSku);
-                    attrValue.put("attrValue", JSON.parseObject(storeProductAttrValues.get(i).getAttrValue(), Feature.OrderedField));
-                    attrValue.put("brokerage", currentAttrValue.getBrokerage());
-                    attrValue.put("brokerageTwo", currentAttrValue.getBrokerageTwo());
-                    String[] skus = currentSku.split(",");
-                    for (int k = 0; k < skus.length; k++) {
-                        attrValue.put("value"+k,skus[k]);
+                    List<StoreProductAttrValue> hasCurrentSku = storeProductAttrValues.stream()
+                            .filter(e -> e.getSuk().equals(currentSku))
+                            .collect(Collectors.toList());
+                    StoreProductAttrValue currentAttrValue = hasCurrentSku.isEmpty() ? null : hasCurrentSku.get(0);
+
+                    // 确保当前商品属性值不为空
+                    if (currentAttrValue != null) {
+                        attrValue.put("id", hasCurrentSku.size() > 0 ? hasCurrentSku.get(0).getId() : 0);
+                        attrValue.put("image", currentAttrValue.getImage());
+                        attrValue.put("cost", currentAttrValue.getCost());
+                        attrValue.put("price", currentAttrValue.getPrice());
+                        attrValue.put("otPrice", currentAttrValue.getOtPrice());
+                        attrValue.put("stock", currentAttrValue.getStock());
+                        attrValue.put("barCode", currentAttrValue.getBarCode());
+                        attrValue.put("weight", currentAttrValue.getWeight());
+                        attrValue.put("volume", currentAttrValue.getVolume());
+                        attrValue.put("suk", currentSku);
+                        attrValue.put("attrValue", JSON.parseObject(storeProductAttrValues.get(i).getAttrValue(), Feature.OrderedField));
+                        attrValue.put("brokerage", currentAttrValue.getBrokerage());
+                        attrValue.put("brokerageTwo", currentAttrValue.getBrokerageTwo());
+
+                        // 确保 sku 不为空
+                        String[] skus = currentSku != null ? currentSku.split(",") : new String[0];
+                        for (int k = 0; k < skus.length; k++) {
+                            attrValue.put("value" + k, skus[k]);
+                        }
+                        attrValues.add(attrValue);
                     }
-                    attrValues.add(attrValue);
                 }
             }
         }
 
-        // H5 端用于生成skuList
+        // H5 端用于生成 skuList
         List<StoreProductAttrValueResponse> sPAVResponses = new ArrayList<>();
-
         for (StoreProductAttrValue storeProductAttrValue : storeProductAttrValues) {
-            StoreProductAttrValueResponse atr = new StoreProductAttrValueResponse();
-            BeanUtils.copyProperties(storeProductAttrValue,atr);
-            sPAVResponses.add(atr);
+            if (storeProductAttrValue != null) {
+                StoreProductAttrValueResponse atr = new StoreProductAttrValueResponse();
+                BeanUtils.copyProperties(storeProductAttrValue, atr);
+                sPAVResponses.add(atr);
+            }
         }
         storeProductResponse.setAttrValues(attrValues);
         storeProductResponse.setAttrValue(sPAVResponses);
-//        if (null != storeProductAttrResult) {
-            StoreProductDescription sd = storeProductDescriptionService.getOne(
-                    new LambdaQueryWrapper<StoreProductDescription>()
-                            .eq(StoreProductDescription::getProductId, storeProduct.getId())
-                            .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_NORMAL));
-            if (null != sd) {
-                storeProductResponse.setContent(null == sd.getDescription()?"":sd.getDescription());
-            }
-//        }
+
+        // 设置商品描述
+        StoreProductDescription sd = storeProductDescriptionService.getOne(
+                new LambdaQueryWrapper<StoreProductDescription>()
+                        .eq(StoreProductDescription::getProductId, storeProduct.getId())
+                        .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_NORMAL));
+        if (sd != null) {
+            storeProductResponse.setContent(sd.getDescription() == null ? "" : sd.getDescription());
+        }
+
         // 获取已关联的优惠券
         List<StoreProductCoupon> storeProductCoupons = storeProductCouponService.getListByProductId(storeProduct.getId());
-        if (null != storeProductCoupons && storeProductCoupons.size() > 0) {
+        if (storeProductCoupons != null && !storeProductCoupons.isEmpty()) {
             List<Integer> ids = storeProductCoupons.stream().map(StoreProductCoupon::getIssueCouponId).collect(Collectors.toList());
             List<StoreCoupon> shipCoupons = storeCouponService.getByIds(ids);
             storeProductResponse.setCoupons(shipCoupons);
             storeProductResponse.setCouponIds(ids);
         }
+
         return storeProductResponse;
     }
+
 
     /**
      * 商品详情（管理端）

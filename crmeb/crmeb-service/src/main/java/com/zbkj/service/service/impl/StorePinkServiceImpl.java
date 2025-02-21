@@ -408,7 +408,7 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
     public StorePink getByProductId(Integer productId) {
         // 使用 MyBatis-Plus 的查询方式，条件查询
         QueryWrapper<StorePink> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("product_id", productId); // 查询条件：product_id = productId
+        queryWrapper.eq("pid", productId); // 查询条件：product_id = productId
         return dao.selectOne(queryWrapper); // 返回查询结果
     }
 
