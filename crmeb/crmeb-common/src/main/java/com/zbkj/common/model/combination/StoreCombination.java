@@ -136,4 +136,8 @@ public class StoreCombination implements Serializable {
     @ApiModelProperty(value = "限量百分比")
     @TableField(exist = false)
     private Integer quotaPercent;
+
+    @ApiModelProperty(value = "营期")
+    @TableField(exist = false)
+    private String operationPeriod;
 }
